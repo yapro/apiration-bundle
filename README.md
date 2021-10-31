@@ -11,15 +11,11 @@ If you wish to cast request to Model object:
     YaPro\ApiRation\Request\ControllerActionArgumentResolver:
       tags:
         - { name: controller.argument_value_resolver, priority: 150 }
-```
 
-```yaml
+    # Объекты ApiRationObjectInterface автоматически преобразовываются в json с помощью ToJsonConverter-а.
     YaPro\ApiRation\Response\ToJsonConverter:
         tags:
             - { name: kernel.event_listener, event: kernel.view, priority: 0, method: onKernelView }
-```
-
-```yaml
 
     YaPro\ApiRation\Exception\ExceptionResolver:
         tags:
