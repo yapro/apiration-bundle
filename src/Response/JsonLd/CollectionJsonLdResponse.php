@@ -10,15 +10,15 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class CollectionJsonLdResponse extends JsonResponse
 {
-	public const ITEMS = 'items';
-	public const TOTAL_ITEMS = 'totalItems';
+	public const ITEMS = 'hydra:member';
+	public const TOTAL_ITEMS = 'hydra:totalItems';
 
     public function __construct(array $items = [], int $totalItems = 0, int $status = Response::HTTP_OK)
 	{
 		$input = new ArrayObject([
                 "@type" => "hydra:Collection",
-                "hydra:member" => $items,
-                "hydra:totalItems" => $totalItems,
+                self::ITEMS => $items,
+                self::TOTAL_ITEMS => $totalItems,
                 /* Example:
                 "hydra:view": {
                     "@id": "/books?page=1",
