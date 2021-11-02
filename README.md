@@ -58,6 +58,7 @@ docker build -t yapro/apiration:latest -f ./Dockerfile ./
 docker run -it --rm -v $(pwd):/app -w /app yapro/apiration:latest bash
 composer install -o
 ```
+
 ,
 "symfony/framework-bundle": "*",
 "symfony/browser-kit": "*",

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Response;
+namespace YaPro\ApiRation\Response\JsonLd;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ResourceCreatedJsonResponse extends JsonResponse
+class ResourceCreatedJsonLdResponse extends JsonResponse
 {
 	public function __construct(int $resourceId)
 	{
