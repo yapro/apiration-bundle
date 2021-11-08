@@ -12,12 +12,6 @@ use function getenv;
 class CorsResolverTest extends HttpTestCase
 {
     use HttpClientJsonExtTrait;
-    //protected function setUp()
-    //{
-    //    parent::setUp();
-    //
-    //    self::bootKernel();
-    //}
 
     private string $userRoleAdmin = 'admin';
 
@@ -41,7 +35,11 @@ class CorsResolverTest extends HttpTestCase
 
     public function testLoginWithSecurityCookie(): void
     {
-        $this->loginAsUser();
+        // todo нужно подключить микро-ядро
+        $this->post('/login', [
+            'email' => 'login',
+            'password' => 'pa$$word',
+        ]);
 
         self::assertResponseIsSuccessful();
 
@@ -64,37 +62,5 @@ class CorsResolverTest extends HttpTestCase
             $this->assertSame('MOCKSESSID', $cookieName[0]);
             $this->assertSame($sameAttributes . 'secure; httponly; samesite=none', trim(implode(';', $cookieParams)));
         }
-    }
-
-    public function loginAsUser($isAdmin = true)
-    {
-        $this->truncateClass(User::class);
-        $username = 'totx@ya.ru';
-        $password = 'pa$$';
-        $this->addUser($username, $password, $isAdmin ? $this->userRoleAdmin : '');
-        $this->login($username, $password);
-    }
-
-    public function addUser(string $username, string $password, string $role = ''): User
-    {
-        $object = new User();
-        $object->setEmail($username);
-        $object->setPlainPassword($password);
-        if ($role !== '') {
-            $object->addRole($role);
-        }
-        self::$dbObjectManager->persist($object);
-        self::$dbObjectManager->flush();
-        self::$dbObjectManager->refresh($object);
-
-        return $object;
-    }
-
-    protected function login(string $username, string $password)
-    {
-        return $this->post('/login', [
-            'email' => $username,
-            'password' => $password,
-        ]);
     }
 }
