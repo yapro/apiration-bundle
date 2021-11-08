@@ -37,11 +37,6 @@ If you wish to cast request to Model object:
             - { name: kernel.event_subscriber }
 ```
 
-Add env variable:
-```shell
-CORS_DOMAIN_NAME=site.com
-```
-
 Tests
 ------------
 ```sh

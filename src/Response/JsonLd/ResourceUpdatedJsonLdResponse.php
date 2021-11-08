@@ -9,8 +9,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ResourceUpdatedJsonLdResponse extends JsonResponse
 {
-	public function __construct(int $resourceId)
+	public function __construct(int $resourceId, array $data = [])
 	{
-		parent::__construct(['id' => $resourceId], Response::HTTP_OK);
+		parent::__construct(['id' => $resourceId] + $data, Response::HTTP_OK);
 	}
 }
