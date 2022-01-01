@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Tests\Functional\Api\JsonConvertModel;
+namespace YaPro\ApiRationBundle\Tests\Functional\Api\JsonConvertModel;
 
 use Symfony\Component\Validator\Constraints as Assert;
 

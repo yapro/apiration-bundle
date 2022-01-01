@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Exception;
+namespace YaPro\ApiRationBundle\Exception;
 
 /**
  * Пока что не обрабатывается, но планы описаны ниже.

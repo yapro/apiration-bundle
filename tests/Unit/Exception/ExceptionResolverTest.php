@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Tests\Unit\Exception;
+namespace YaPro\ApiRationBundle\Tests\Unit\Exception;
 
 use Doctrine\DBAL\Driver\PDOException;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
@@ -19,9 +19,9 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
-use YaPro\ApiRation\Exception\BadRequestException;
-use YaPro\ApiRation\Exception\ExceptionResolver;
-use YaPro\ApiRation\Exception\NotFoundException;
+use YaPro\ApiRationBundle\Exception\BadRequestException;
+use YaPro\ApiRationBundle\Exception\ExceptionResolver;
+use YaPro\ApiRationBundle\Exception\NotFoundException;
 use YaPro\Helper\LiberatorTrait;
 
 class ExceptionResolverTest extends TestCase
@@ -179,11 +179,11 @@ class ExceptionResolverTest extends TestCase
 
         $exceptionResolver->onKernelException($event);
 
-        $request = $event->getResponse();
+        $response = $event->getResponse();
         if (null !== $expectedResponse) {
-            $request->setDate($expectedResponse->getDate());
+            $response->setDate($expectedResponse->getDate());
         }
-        self::assertEquals($expectedResponse, $request);
+        self::assertEquals($expectedResponse, $response);
     }
 
     public function providerJsonEncodeResponseContent(): Generator

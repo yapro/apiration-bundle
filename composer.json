@@ -1,5 +1,5 @@
 {
-  "name": "yapro/apiration",
+  "name": "yapro/apiration-bundle",
   "type": "library",
   "description": "Api tool",
   "keywords": ["php", "api", "tool"],
@@ -19,24 +19,30 @@
     "symfony/http-foundation": "*",
     "symfony/http-kernel": "*",
     "symfony/translation": "*",
-    "doctrine/dbal": "*",
+    "doctrine/dbal": "2.*",
     "symfony/serializer": "*",
     "symfony/validator": "*",
     "laminas/laminas-code": "<4.0",
     "yapro/helpers": "*"
   },
+  "require-dev": {
+    "doctrine/orm": "*",
+    "symfony/phpunit-bridge": "*",
+    "symfony/browser-kit": "*",
+    "doctrine/annotations": "*",
+    "symfony/yaml": "*",
+    "symfony/routing": "*",
+    "symfony/framework-bundle": "*"
+  },
   "autoload": {
     "psr-4": {
-      "YaPro\\ApiRation\\": "src/"
+      "YaPro\\ApiRationBundle\\": "src/"
     }
-  },
-
-  "require-dev": {
-    "phpunit/phpunit": ">=6.0"
   },
   "autoload-dev": {
     "psr-4": {
-      "YaPro\\ApiRation\\Tests\\": "tests/"
+      "YaPro\\ApiRationBundle\\Tests\\": "tests/"
     }
-  }
+  },
+  "minimum-stability": "dev"
 }

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Tests\Functional\Cors;
+namespace YaPro\ApiRationBundle\Tests\Functional\Cors;
 
-use YaPro\ApiRation\Cors\CorsResolver;
-use YaPro\ApiRation\Tests\HttpTestCase;
+use YaPro\ApiRationBundle\Cors\CorsResolver;
+use YaPro\ApiRationBundle\Tests\HttpTestCase;
 use YaPro\SymfonyHttpClientExt\HttpClientJsonExtTrait;
 use function getenv;
 

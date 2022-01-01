@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Exception;
+namespace YaPro\ApiRationBundle\Exception;
 
 use function is_string;
 use Symfony\Component\HttpFoundation\Response;

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Tests\Unit\Request;
+namespace YaPro\ApiRationBundle\Tests\Unit\Request;
 
 use Generator;
 use Laminas\Code\Reflection\DocBlock\Tag\ParamTag;
 use Laminas\Code\Reflection\DocBlock\Tag\ReturnTag;
 use Laminas\Code\Reflection\DocBlock\Tag\TagInterface;
-use YaPro\ApiRation\Exception\BadRequestException;
-use YaPro\ApiRation\Request\ControllerActionArgumentResolver;
+use YaPro\ApiRationBundle\Exception\BadRequestException;
+use YaPro\ApiRationBundle\Request\ControllerActionArgumentResolver;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;

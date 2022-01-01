@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Tests\Functional\Request;
+namespace YaPro\ApiRationBundle\Tests\Functional\Request;
 
 use Generator;
-use YaPro\ApiRation\Exception\BadRequestException;
-use YaPro\ApiRation\Request\ControllerActionArgumentResolver;
-use YaPro\ApiRation\Tests\Functional\Request\ApiRationObject\DollModel;
-use YaPro\ApiRation\Tests\Functional\Request\ApiRationObject\KenModel;
+use YaPro\ApiRationBundle\Exception\BadRequestException;
+use YaPro\ApiRationBundle\Request\ControllerActionArgumentResolver;
+use YaPro\ApiRationBundle\Tests\Functional\Request\ApiRationObject\DollModel;
+use YaPro\ApiRationBundle\Tests\Functional\Request\ApiRationObject\KenModel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;

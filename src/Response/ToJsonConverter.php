@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Response;
+namespace YaPro\ApiRationBundle\Response;
 
-use YaPro\ApiRation\Marker\ApiRationObjectInterface;
+use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\Serializer\SerializerInterface;

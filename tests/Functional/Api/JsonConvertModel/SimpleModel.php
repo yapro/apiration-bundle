@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Tests\Functional\Api\JsonConvertModel;
+namespace YaPro\ApiRationBundle\Tests\Functional\Api\JsonConvertModel;
 
-use YaPro\ApiRation\Marker\ApiRationObjectInterface;
+use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
 
 class SimpleModel implements ApiRationObjectInterface
 {

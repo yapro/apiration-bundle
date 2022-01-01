@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Tests\Functional\Exception;
+namespace YaPro\ApiRationBundle\Tests\Functional\Exception;
 
 use Doctrine\DBAL\Driver\PDOException;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
@@ -10,9 +10,9 @@ use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\ORMInvalidArgumentException;
 use Exception;
 use Generator;
-use YaPro\ApiRation\Exception\BadRequestException as OperationBadRequestException;
-use YaPro\ApiRation\Exception\NotFoundException;
-use YaPro\ApiRation\Exception\ExceptionResolver;
+use YaPro\ApiRationBundle\Exception\BadRequestException as OperationBadRequestException;
+use YaPro\ApiRationBundle\Exception\NotFoundException;
+use YaPro\ApiRationBundle\Exception\ExceptionResolver;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;

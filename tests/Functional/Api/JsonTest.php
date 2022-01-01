@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Tests\Functional\Api;
+namespace YaPro\ApiRationBundle\Tests\Functional\Api;
 
 use YaPro\SymfonyHttpClientExt\HttpClientExtTrait;
 use YaPro\SymfonyHttpTestExt\BaseTestCase;

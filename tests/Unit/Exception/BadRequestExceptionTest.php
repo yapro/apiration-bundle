@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Tests\Unit\Exception;
+namespace YaPro\ApiRationBundle\Tests\Unit\Exception;
 
-use YaPro\ApiRation\Exception\BadRequestException;
+use YaPro\ApiRationBundle\Exception\BadRequestException;
 use PHPUnit\Framework\TestCase;
 
 class BadRequestExceptionTest extends TestCase

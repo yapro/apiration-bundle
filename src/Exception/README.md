@@ -63,10 +63,10 @@ Symfony Http Exception-ы
 --
 |Http-code|Info|
 |---|---|
-|400|YaPro\ApiRation\Exception\BadRequestException - ошибка валидации переданных данных (синтаксис запроса является неправильным)|
-|403|YaPro\ApiRation\Exception\AccessDeniedHttpException - Forbidden : доступ для клиента к запрашиваемому ресурсу не разрешен|
-|404|YaPro\ApiRation\Exception\NotFoundHttpException - Not Found : запрашиваемый ресурс не найден|
-|409|YaPro\ApiRation\Exception\ConflictHttpException - Already exists : сущность уже существует|
+|400|YaPro\ApiRationBundle\Exception\BadRequestException - ошибка валидации переданных данных (синтаксис запроса является неправильным)|
+|403|YaPro\ApiRationBundle\Exception\AccessDeniedHttpException - Forbidden : доступ для клиента к запрашиваемому ресурсу не разрешен|
+|404|YaPro\ApiRationBundle\Exception\NotFoundHttpException - Not Found : запрашиваемый ресурс не найден|
+|409|YaPro\ApiRationBundle\Exception\ConflictHttpException - Already exists : сущность уже существует|
 |422|Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException - ошибка обработки переданных данных (синтаксис запроса является правильным)|
 
 Но, если нужно выбросить какой-то другой Exception, посмотрите, может нужный Exception уже есть в директории:

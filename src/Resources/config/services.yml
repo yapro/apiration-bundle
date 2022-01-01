@@ -1,0 +1,21 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    YaPro\ApiRationBundle\:
+        resource: '../../{Cors}'
+
+    YaPro\ApiRationBundle\Request\ControllerActionArgumentResolver:
+        tags:
+            - { name: controller.argument_value_resolver, priority: 150 }
+
+    # Объекты ApiRationObjectInterface автоматически преобразовываются в json с помощью ToJsonConverter-а.
+    YaPro\ApiRationBundle\Response\ToJsonConverter:
+        tags:
+            - { name: kernel.event_listener, event: kernel.view, priority: 0, method: onKernelView }
+
+    YaPro\ApiRationBundle\Exception\ExceptionResolver:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }

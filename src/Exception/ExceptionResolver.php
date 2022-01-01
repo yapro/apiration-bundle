@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Exception;
+namespace YaPro\ApiRationBundle\Exception;
 
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use YaPro\ApiRation\Exception\BadRequestException as OperationBadRequestException;
+use YaPro\ApiRationBundle\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -46,7 +46,7 @@ class ExceptionResolver
         $errors = self::DEFAULT_ERRORS;
         $headers = self::DEFAULT_HEADERS;
 
-        if ($exception instanceof OperationBadRequestException) {
+        if ($exception instanceof BadRequestException) {
             $httpStatusCode = Response::HTTP_BAD_REQUEST;
             $data = $exception->jsonSerialize();
             $message = $this->translator->trans($data['message']);

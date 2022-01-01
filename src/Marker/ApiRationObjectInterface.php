@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Marker;
+namespace YaPro\ApiRationBundle\Marker;
 
 use YaPro\MarkerInterfaces\Base\ValueObjectInterface;
 

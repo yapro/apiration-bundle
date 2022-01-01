@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Request;
+namespace YaPro\ApiRationBundle\Request;
 
-use YaPro\ApiRation\Marker\ApiRationObjectInterface;
+use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
 use YaPro\Helper\Validation\ScalarValidator;
 use function class_implements;
 use function explode;
@@ -13,7 +13,7 @@ use function is_string;
 use Laminas\Code\Reflection\ClassReflection;
 use Laminas\Code\Reflection\DocBlock\Tag\ParamTag;
 use Laminas\Code\Reflection\DocBlock\Tag\TagInterface;
-use YaPro\ApiRation\Exception\BadRequestException;
+use YaPro\ApiRationBundle\Exception\BadRequestException;
 use function str_replace;
 use function strtolower;
 use Symfony\Component\HttpFoundation\ParameterBag;

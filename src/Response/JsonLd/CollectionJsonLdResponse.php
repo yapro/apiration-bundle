@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Response\JsonLd;
+namespace YaPro\ApiRationBundle\Response\JsonLd;
 
 use ArrayObject;
 use Symfony\Component\HttpFoundation\Request;

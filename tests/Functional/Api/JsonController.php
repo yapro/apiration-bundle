@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRation\Tests\Functional\Api;
+namespace YaPro\ApiRationBundle\Tests\Functional\Api;
 
-use YaPro\ApiRation\Tests\Functional\Api\JsonConvertModel\KenModel;
-use YaPro\ApiRation\Tests\Functional\Api\JsonConvertModel\SimpleModel;
+use YaPro\ApiRationBundle\Tests\Functional\Api\JsonConvertModel\KenModel;
+use YaPro\ApiRationBundle\Tests\Functional\Api\JsonConvertModel\SimpleModel;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;

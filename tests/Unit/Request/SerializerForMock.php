@@ -1,6 +1,6 @@
 <?php
 
-namespace YaPro\ApiRation\Tests\Unit\Request;
+namespace YaPro\ApiRationBundle\Tests\Unit\Request;
 
 use Symfony\Component\Serializer\SerializerInterface;
 

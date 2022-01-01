@@ -1,9 +1,9 @@
 <?php
 
 
-namespace YaPro\ApiRation\Tests\Unit\Request;
+namespace YaPro\ApiRationBundle\Tests\Unit\Request;
 
-use YaPro\ApiRation\Marker\ApiRationObjectInterface;
+use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
 
 class ExampleApiRationObject implements ApiRationObjectInterface
 {
