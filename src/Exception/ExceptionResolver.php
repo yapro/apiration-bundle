@@ -72,6 +72,7 @@ class ExceptionResolver
         } elseif ($exception instanceof HttpExceptionInterface) {
             // в дев-режиме мы должны знать все детали об ошибке - обработка ошибки будет передана Symfony:
             if ($_SERVER['APP_ENV'] === 'dev') {
+                // полагаемся на симфоневый обработчик эксепшенов
                 return;
             }
             // HttpExceptionInterface is a special type of exception that holds status code and header details
@@ -105,13 +106,13 @@ class ExceptionResolver
             $exception->getPrevious() &&
             // в третьей версии Doctrine\DBAL уже нет PDOException
             class_exists('Doctrine\DBAL\Driver\PDOException') &&
-            $exception->getPrevious() instanceof Doctrine\DBAL\Driver\PDOException &&
+            $exception->getPrevious() instanceof \Doctrine\DBAL\Driver\PDOException &&
             (
                 // Check exception: SQLSTATE[23505]: Unique violation: 7 ERROR:  duplicate key value violates unique
                 // constraint ... DETAIL:  Key ... already exists.
                 $exception->getPrevious()->getCode() === self::EXCEPTION_CODE_UNIQUE_CONSTRAINT //
                 // SQLSTATE[23000]: Integrity constraint violation: 1062 Duplicate entry
-             || $exception->getPrevious()->getCode() === self::EXCEPTION_CODE_DUPLICATE_ENTRY // попытка нарушить уникальный ключ по полю
+                || $exception->getPrevious()->getCode() === self::EXCEPTION_CODE_DUPLICATE_ENTRY // попытка нарушить уникальный ключ по полю
             );
     }
 
@@ -145,7 +146,7 @@ class ExceptionResolver
     private function isORMInvalidArgumentException($exception): bool
     {
         return class_exists('Doctrine\ORM\ORMInvalidArgumentException')
-            && $exception instanceof Doctrine\ORM\ORMInvalidArgumentException
+            && $exception instanceof \Doctrine\ORM\ORMInvalidArgumentException
             && mb_strpos($exception->getMessage(), self::ORM_INVALID_ARGUMENT_EXCEPTION_MESSAGE) === 0;
     }
 

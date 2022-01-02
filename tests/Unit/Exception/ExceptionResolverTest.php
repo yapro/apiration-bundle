@@ -35,10 +35,10 @@ class ExceptionResolverTest extends TestCase
             'event' => new ExceptionEvent(
                 $this->createMock(HttpKernelInterface::class),
                 new Request(),
-                HttpKernelInterface::MASTER_REQUEST,
+                HttpKernelInterface::MAIN_REQUEST,
                 new Exception($exceptionMsg)
             ),
-            'expectedRequest' => null,
+            'expectedResponse' => null,
         ];
 
         $exception = new BadRequestException(
@@ -50,7 +50,7 @@ class ExceptionResolverTest extends TestCase
             'event' => new ExceptionEvent(
                 $this->createMock(HttpKernelInterface::class),
                 new Request(),
-                HttpKernelInterface::MASTER_REQUEST,
+                HttpKernelInterface::MAIN_REQUEST,
                 $exception
             ),
             'expectedResponse' => $this->createJsonResponse(
@@ -65,10 +65,10 @@ class ExceptionResolverTest extends TestCase
             'event' => new ExceptionEvent(
                 $this->createMock(HttpKernelInterface::class),
                 new Request(),
-                HttpKernelInterface::MASTER_REQUEST,
+                HttpKernelInterface::MAIN_REQUEST,
                 new NotFoundException($exceptionMsg)
             ),
-            'expectedRequest' => $this->createJsonResponse(
+            'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS,
                 Response::HTTP_OK,
                 $exceptionMsg,
@@ -82,10 +82,10 @@ class ExceptionResolverTest extends TestCase
             'event' => new ExceptionEvent(
                 $this->createMock(HttpKernelInterface::class),
                 new Request(),
-                HttpKernelInterface::MASTER_REQUEST,
+                HttpKernelInterface::MAIN_REQUEST,
                 new UniqueConstraintViolationException($exceptionMsg, (new PDOException($pdoException)))
             ),
-            'expectedRequest' => $this->createJsonResponse(
+            'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS,
                 Response::HTTP_CONFLICT,
                 ExceptionResolver::MSG_ON_DUPLICATE_ROWS,
@@ -97,10 +97,10 @@ class ExceptionResolverTest extends TestCase
             'event' => new ExceptionEvent(
                 $this->createMock(HttpKernelInterface::class),
                 new Request(),
-                HttpKernelInterface::MASTER_REQUEST,
+                HttpKernelInterface::MAIN_REQUEST,
                 new ORMInvalidArgumentException(ExceptionResolver::ORM_INVALID_ARGUMENT_EXCEPTION_MESSAGE)
             ),
-            'expectedRequest' => $this->createJsonResponse(
+            'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS,
                 Response::HTTP_OK,
                 ExceptionResolver::MSG_ON_ORM_INVALID_ARGUMENT,
@@ -112,10 +112,10 @@ class ExceptionResolverTest extends TestCase
             'event' => new ExceptionEvent(
                 $this->createMock(HttpKernelInterface::class),
                 new Request(),
-                HttpKernelInterface::MASTER_REQUEST,
+                HttpKernelInterface::MAIN_REQUEST,
                 new ForeignKeyConstraintViolationException($exceptionMsg, (new PDOException($pdoException)))
             ),
-            'expectedRequest' => $this->createJsonResponse(
+            'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS,
                 Response::HTTP_OK,
                 sprintf(ExceptionResolver::MSG_ON_FOREIGN_CONSTRAINT_VIOLATION, ' - error occurred'),
@@ -127,13 +127,13 @@ class ExceptionResolverTest extends TestCase
             'event' => new ExceptionEvent(
                 $this->createMock(HttpKernelInterface::class),
                 new Request(),
-                HttpKernelInterface::MASTER_REQUEST,
+                HttpKernelInterface::MAIN_REQUEST,
                 new ForeignKeyConstraintViolationException(
                     $exceptionMsg . ExceptionResolver::SEPARATOR_IN_MSG_ON_FOREIGN_CONSTRAINT_VIOLATION . ' some_field_name',
                     (new PDOException($pdoException))
                 )
             ),
-            'expectedRequest' => $this->createJsonResponse(
+            'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS,
                 Response::HTTP_OK,
                 sprintf(ExceptionResolver::MSG_ON_FOREIGN_CONSTRAINT_VIOLATION, ' some_field_name'),
@@ -151,10 +151,10 @@ class ExceptionResolverTest extends TestCase
             'event' => new ExceptionEvent(
                 $this->createMock(HttpKernelInterface::class),
                 new Request(),
-                HttpKernelInterface::MASTER_REQUEST,
+                HttpKernelInterface::MAIN_REQUEST,
                 $httpExceptionMock
             ),
-            'expectedRequest' => $this->createJsonResponse(
+            'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS + $additionalHeaders,
                 $statusCode,
                 Response::$statusTexts[$statusCode],
@@ -180,7 +180,8 @@ class ExceptionResolverTest extends TestCase
         $exceptionResolver->onKernelException($event);
 
         $response = $event->getResponse();
-        if (null !== $expectedResponse) {
+        if ($response !== null) {
+            // подменяем динамично созданную дату времени образования респонса
             $response->setDate($expectedResponse->getDate());
         }
         self::assertEquals($expectedResponse, $response);

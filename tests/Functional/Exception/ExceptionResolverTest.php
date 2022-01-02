@@ -45,36 +45,36 @@ class ExceptionResolverTest extends TestCase
             $exceptionMsg,
             ['some_field_name' => 'some error about some_field_name']
         );
+        /*
+                yield [
+                    'event' => new ExceptionEvent(
+                        $this->createMock(HttpKernelInterface::class),
+                        new Request(),
+                        HttpKernelInterface::MASTER_REQUEST,
+                        $exception
+                    ),
+                    'expectedResponse' => $this->createJsonResponse(
+                        ExceptionResolver::DEFAULT_HEADERS,
+                        Response::HTTP_BAD_REQUEST,
+                        $exceptionMsg,
+                        $exception->jsonSerialize()['errors']
+                    ),
+                ];
 
-        yield [
-            'event' => new ExceptionEvent(
-                $this->createMock(HttpKernelInterface::class),
-                new Request(),
-                HttpKernelInterface::MASTER_REQUEST,
-                $exception
-            ),
-            'expectedResponse' => $this->createJsonResponse(
-                ExceptionResolver::DEFAULT_HEADERS,
-                Response::HTTP_BAD_REQUEST,
-                $exceptionMsg,
-                $exception->jsonSerialize()['errors']
-            ),
-        ];
-
-        yield [
-            'event' => new ExceptionEvent(
-                $this->createMock(HttpKernelInterface::class),
-                new Request(),
-                HttpKernelInterface::MASTER_REQUEST,
-                new NotFoundException($exceptionMsg)
-            ),
-            'expectedRequest' => $this->createJsonResponse(
-                ExceptionResolver::DEFAULT_HEADERS,
-                Response::HTTP_OK,
-                $exceptionMsg,
-                ExceptionResolver::DEFAULT_ERRORS
-            ),
-        ];
+                yield [
+                    'event' => new ExceptionEvent(
+                        $this->createMock(HttpKernelInterface::class),
+                        new Request(),
+                        HttpKernelInterface::MASTER_REQUEST,
+                        new NotFoundException($exceptionMsg)
+                    ),
+                    'expectedRequest' => $this->createJsonResponse(
+                        ExceptionResolver::DEFAULT_HEADERS,
+                        Response::HTTP_OK,
+                        $exceptionMsg,
+                        ExceptionResolver::DEFAULT_ERRORS
+                    ),
+                ];*/
 
         $pdoException = new \PDOException('SQLSTATE[' . ExceptionResolver::EXCEPTION_CODE_DUPLICATE_ENTRY . ']');
         $this->setClassPropertyValue($pdoException, 'code', ExceptionResolver::EXCEPTION_CODE_DUPLICATE_ENTRY);
