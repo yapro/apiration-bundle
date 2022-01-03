@@ -29,26 +29,22 @@ Tests
 docker build -t yapro/apiration-bundle:latest -f ./Dockerfile ./
 docker run --user=1000:1000 --rm -v $(pwd):/app yapro/apiration-bundle:latest bash -c "cd /app \
   && composer install --optimize-autoloader --no-scripts --no-interaction \
-  && vendor/bin/phpunit --testsuite=Unit"
+  && vendor/bin/simple-phpunit --testsuite=Unit,Functional"
 ```
 
 Dev
 ------------
 ```sh
 docker build -t yapro/apiration-bundle:latest -f ./Dockerfile ./
-docker run --user=1000:1000 -it --rm -v $(pwd):/app -w /app yapro/apiration-bundle:latest bash
+docker run --user=1000:1000 --add-host=host.docker.internal:host-gateway -it --rm -v $(pwd):/app -w /app yapro/apiration-bundle:latest bash
 composer install -o
 ```
 Debug PHP:
 ```sh
-docker run --user=1000:1000 --add-host=host.docker.internal:host-gateway --rm -v $(pwd):/app yapro/apiration-bundle:latest bash -c "cd /app \
-  && composer install --optimize-autoloader --no-interaction \
-  && PHP_IDE_CONFIG=\"serverName=common\" \
-     XDEBUG_SESSION=common \
-     XDEBUG_MODE=debug \
-     XDEBUG_CONFIG=\"max_nesting_level=200 client_port=9003 client_host=host.docker.internal\" \
-     vendor/bin/simple-phpunit --cache-result-file=/tmp/phpunit.cache --testsuite=Unit"
+PHP_IDE_CONFIG="serverName=common" \
+XDEBUG_SESSION=common \
+XDEBUG_MODE=debug \
+XDEBUG_CONFIG="max_nesting_level=200 client_port=9003 client_host=host.docker.internal" \
+vendor/bin/simple-phpunit --cache-result-file=/tmp/phpunit.cache -v --stderr --stop-on-incomplete --stop-on-defect \
+--stop-on-failure --stop-on-warning --fail-on-warning --stop-on-risky --fail-on-risky tests/Functional/Api
 ```
-
-"yapro/symfony-http-test-ext": "^1.0",
-"yapro/doctrine-ext": "dev-master"

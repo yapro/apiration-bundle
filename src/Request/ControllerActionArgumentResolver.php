@@ -59,7 +59,7 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(Request $request, ArgumentMetadata $argument)
+    public function supports(Request $request, ArgumentMetadata $argument): bool
     {
         if ($argument->getType() === 'array') {
             // если аргумент объявлен как коллекция ApiRationObjectInterface-объектов

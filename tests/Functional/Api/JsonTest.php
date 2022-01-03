@@ -13,11 +13,10 @@ class JsonTest extends BaseTestCase
 
     public function testInt(): void
     {
+        //$client = self::createClient();
+        $this->get('/app');
         $this->get('/api-json-test/123');
-        self::assertEquals(
-            '{"id":123}',
-            $this->getResponseObject()->getContent()
-        );
+        $this->assertJsonResponse('{"id":123}');
     }
 
     public function testSimpleModel(): void
@@ -28,10 +27,7 @@ class JsonTest extends BaseTestCase
             'varBoolean' => 'true', // делаем строкой, иначе будет строковая 1
             'varFloat' => 0.123,
         ]);
-        self::assertEquals(
-            '{"varString":"string","varInteger":123,"varBoolean":true,"varFloat":0.123,"varNull":null}',
-            $this->getResponseObject()->getContent()
-        );
+        $this->assertJsonResponse('{"varString":"string","varInteger":123,"varBoolean":true,"varFloat":0.123,"varNull":null}');
     }
 
     public function testSimpleModels(): void

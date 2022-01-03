@@ -32,7 +32,8 @@
     "doctrine/annotations": "*",
     "symfony/yaml": "*",
     "symfony/routing": "*",
-    "symfony/framework-bundle": "*"
+    "symfony/framework-bundle": "*",
+    "yapro/symfony-http-test-ext": "dev-master"
   },
   "autoload": {
     "psr-4": {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRationBundle\Tests\Functional\Api\JsonConvertModel;
+namespace YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel;
 
 use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
 

@@ -2,18 +2,19 @@
 
 namespace YaPro\ApiRationBundle\Tests\FunctionalExt\App;
 
-use Bankiru\MetaTagsLogBundle\MetaTagsLogBundle;
+use YaPro\ApiRationBundle\ApiRationBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
+use function mkdir;
+use function mt_rand;
+
 class AppKernel extends Kernel
 {
     use MicroKernelTrait;
-
-	const TMP_APP_CACHE = '/tmp/app-cache';
 
 	public function configureContainer(ContainerConfigurator $container): void
     {
@@ -39,7 +40,7 @@ class AppKernel extends Kernel
     {
         return [
             new FrameworkBundle(),
-            new MetaTagsLogBundle()
+            new ApiRationBundle()
         ];
     }
 
@@ -50,6 +51,6 @@ class AppKernel extends Kernel
 
     public function getCacheDir(): string
     {
-        return self::TMP_APP_CACHE;
+        return '/tmp/app-cache';
     }
 }

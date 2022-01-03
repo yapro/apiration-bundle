@@ -21,3 +21,9 @@ RUN curl https://getcomposer.org/download/2.0.12/composer.phar --output /usr/bin
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+ENV COMPOSER_HOME=/tmp/composer-home
+RUN mkdir $COMPOSER_HOME
+# Сохраняем конфигурацию глобально в файле: $COMPOSER_HOME/config.json
+RUN composer config --global "preferred-install.yapro/*" source
+# Check alternative: composer update yapro/* --prefer-source
