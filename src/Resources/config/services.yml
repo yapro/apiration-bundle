@@ -19,3 +19,5 @@ services:
     YaPro\ApiRationBundle\Exception\ExceptionResolver:
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
+
+    YaPro\Helper\Validation\ScalarValidator: ~

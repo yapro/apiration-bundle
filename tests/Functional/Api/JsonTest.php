@@ -13,8 +13,6 @@ class JsonTest extends BaseTestCase
 
     public function testInt(): void
     {
-        //$client = self::createClient();
-        $this->get('/app');
         $this->get('/api-json-test/123');
         $this->assertJsonResponse('{"id":123}');
     }
@@ -39,10 +37,7 @@ class JsonTest extends BaseTestCase
                 'varBoolean' => true,
             ],
         ]);
-        self::assertEquals(
-            '[{"varString":"string","varInteger":123,"varBoolean":true,"varFloat":0,"varNull":null}]',
-            $this->getResponseObject()->getContent()
-        );
+        $this->assertJsonResponse('[{"varString":"string","varInteger":123,"varBoolean":true,"varFloat":0,"varNull":null}]');
     }
 
     public function testFamilyModel(): void
@@ -63,9 +58,6 @@ class JsonTest extends BaseTestCase
                 ],
             ],
         ]);
-        self::assertEquals(
-            '{"wife":{"name":"Barbie"},"kids":[{"name":"Todd"},{"name":"Stacie"}],"surname":"","city":"","name":"Ken"}',
-            $this->getResponseObject()->getContent()
-        );
+        $this->assertJsonResponse('{"wife":{"name":"Barbie"},"kids":[{"name":"Todd"},{"name":"Stacie"}],"surname":"","city":"","name":"Ken"}');
     }
 }

@@ -3,20 +3,12 @@ declare(strict_types=1);
 
 namespace YaPro\ApiRationBundle\Tests\FunctionalExt\App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel\KenModel;
 use YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel\SimpleModel;
-
-use function fopen;
-use function strpos;
 
 class AppController extends AbstractController
 {
@@ -31,7 +23,7 @@ class AppController extends AbstractController
     /**
      * @Route("/api-json-test/{id<\d+>}")
      */
-    public function discountOrder(int $id, ContainerInterface $container): JsonResponse
+    public function discountOrder(int $id): JsonResponse
     {
         return $this->json(['id' => $id]);
     }

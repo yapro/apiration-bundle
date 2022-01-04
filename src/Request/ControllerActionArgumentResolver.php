@@ -6,6 +6,7 @@ namespace YaPro\ApiRationBundle\Request;
 
 use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
 use YaPro\Helper\Validation\ScalarValidator;
+use function class_exists;
 use function class_implements;
 use function explode;
 use function in_array;
@@ -145,9 +146,11 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
             && $classNameWithNamespace = $this->getClassNameWithNamespace($controllerActionFunction, $argument->getName())
         ) {
             yield $this->apply($request, $this->getClassNameWithNamespaceForApply($classNameWithNamespace));
+            return;
         }
         if ($this->isApiRationObjectInterface($argument->getType())) {
             yield $this->apply($request, $argument->getType());
+            return;
         }
         yield null;
     }
@@ -273,6 +276,9 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
             // когда в Controller::action() передается скалярный тип данных:
             || in_array(strtolower($classNameWithNamespace), ['string', 'float', 'int', 'integer', 'bool', 'boolean'], true)
         ) {
+            return false;
+        }
+        if (false === class_exists($classNameWithNamespace)) {
             return false;
         }
         $implements = class_implements($classNameWithNamespace, true);

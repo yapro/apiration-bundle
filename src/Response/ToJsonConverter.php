@@ -10,8 +10,6 @@ use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\Serializer\SerializerInterface;
 
 use function is_array;
-use function mb_strtolower;
-use function strpos;
 
 /**
  * Возвращаемый Controller::action()-ом объект преобразует в Json-структуру.
@@ -62,7 +60,13 @@ class ToJsonConverter
     public function onKernelView(ViewEvent $event): void
     {
         $result = $event->getControllerResult();
-        if (!$result instanceof ApiRationObjectInterface) {
+        if (is_array($result)) {
+            foreach ($result as $item) {
+                if (!$item instanceof ApiRationObjectInterface) {
+                    return;
+                }
+            }
+        } elseif (!$result instanceof ApiRationObjectInterface) {
             return;
         }
         $contentType = $this->getContentType($event->getRequest());
