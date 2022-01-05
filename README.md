@@ -12,12 +12,12 @@ composer require yapro/apiration-bundle dev-master
 ## CORS (Optionally)
 
 ```yaml
-    YaPro\ApiRationBundle\Response\CorsResolver:
+    YaPro\ApiRationBundle\Cors\CorsResolver:
         tags:
             - { name: kernel.event_subscriber }
 ```
 
-If the library doesn't work, please add the following lines to services.yml:
+If the library doesn't work, try to add the following lines to services.yml:
 ```yaml
     Symfony\Component\Serializer\Encoder\JsonDecode: ~
     Symfony\Component\Serializer\Encoder\JsonEncode: ~

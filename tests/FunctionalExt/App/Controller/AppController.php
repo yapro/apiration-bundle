@@ -79,4 +79,17 @@ class AppController extends AbstractController
         return new ApiResourceUpdatedHttpResponse($object->getId());
     }
      */
+
+    /**
+     * @Route("/login", name="app_login", methods={"POST"})
+     * @return JsonResponse|Response
+     */
+    public function login(): JsonResponse
+    {
+        return $this->json(
+            [
+                'id' => 123,
+                'email' =>  'name@yapro.ru',
+            ]);
+    }
 }

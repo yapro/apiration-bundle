@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace YaPro\ApiRationBundle\Tests\Functional\Cors;
 
 use YaPro\ApiRationBundle\Cors\CorsResolver;
-use YaPro\ApiRationBundle\Tests\HttpTestCase;
-use YaPro\SymfonyHttpClientExt\HttpClientJsonExtTrait;
-use function getenv;
+use YaPro\SymfonyHttpClientExt\HttpClientExtTrait;
+use YaPro\SymfonyHttpTestExt\BaseTestCase;
 
-class CorsResolverTest extends HttpTestCase
+// Т.к. это доп. функциональность, то:
+// - ниже созданные тесты отключены с помощью phpunit.xml.dist
+// - testLoginWithSecurityCookie не может быть пройден, т.к. требует функционала симфони-авторизации порождающий пхп-сессию
+class CorsResolverTest extends BaseTestCase
 {
-    use HttpClientJsonExtTrait;
+    use HttpClientExtTrait;
 
     private string $userRoleAdmin = 'admin';
 
@@ -35,7 +37,6 @@ class CorsResolverTest extends HttpTestCase
 
     public function testLoginWithSecurityCookie(): void
     {
-        // todo нужно подключить микро-ядро
         $this->post('/login', [
             'email' => 'login',
             'password' => 'pa$$word',

@@ -21,3 +21,8 @@ services:
             - { name: kernel.event_listener, event: kernel.exception }
 
     YaPro\Helper\Validation\ScalarValidator: ~
+
+#    Optionally:
+#    YaPro\ApiRationBundle\Cors\CorsResolver:
+#        tags:
+#            - { name: kernel.event_subscriber }
