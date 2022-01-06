@@ -23,7 +23,7 @@
     "symfony/validator": "*",
     "laminas/laminas-code": "<4.0",
     "yapro/helpers": "*",
-    "symfony/serializer-pack": "dev-main"
+    "symfony/serializer-pack": "*"
   },
   "require-dev": {
     "doctrine/orm": "*",
