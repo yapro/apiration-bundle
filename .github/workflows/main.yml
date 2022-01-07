@@ -20,8 +20,8 @@ jobs:
         image: php:7-fpm-buster
         options: -v ${{ github.workspace }}:/app -e ABC=123
         run: |
-          echo "Running Script"
-          php -v
+          composer install --optimize-autoloader --no-scripts --no-interaction
+          vendor/bin/simple-phpunit --testsuite=Unit,Functional
 #    - name: My first step
 #      uses: docker://php:7-fpm-buster
 #      with:
