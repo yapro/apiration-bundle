@@ -18,6 +18,6 @@ jobs:
     - name: My first step
       uses: docker://php:7-fpm-buster
       with:
-        entrypoint: php -v
+        entrypoint: sh
     - name: run command
       run: composer validate --strict
