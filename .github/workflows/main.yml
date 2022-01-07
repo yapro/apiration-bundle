@@ -15,10 +15,17 @@ jobs:
     steps:
     - name: "Checkout on commit in the repository"
       uses: actions/checkout@v2
-    - name: My first step
-      uses: docker://php:7-fpm-buster
+    - uses: addnab/docker-run-action@v3
       with:
-        entrypoint: /usr/local/bin/php -v
+        image: php:7-fpm-buster
+        options: -v ${{ github.workspace }}:/app -e ABC=123
+        run: |
+          echo "Running Script"
+          php -v
+#    - name: My first step
+#      uses: docker://php:7-fpm-buster
+#      with:
+#        entrypoint: /usr/local/bin/php -v
 #    - name: run command
 #      run: php -v
 #      run: composer validate --strict
