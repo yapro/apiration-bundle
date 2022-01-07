@@ -15,10 +15,10 @@ jobs:
     steps:
     - name: "Checkout on commit in the repository"
       uses: actions/checkout@v2
-#    - name: My first step
-#      uses: docker://php:7-fpm-buster
-#      with:
-#        entrypoint: sh
+    - name: My first step
+      uses: docker://php:7-fpm-buster
+      with:
+        entrypoint: sh
     - name: run command
       run: php -v
 #      run: composer validate --strict
