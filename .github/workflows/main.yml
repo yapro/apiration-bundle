@@ -19,7 +19,7 @@ jobs:
       run: docker build -t yapro/apiration-bundle:latest -f ./Dockerfile ./
 #      docker build . --file Dockerfile --tag my-image-name:latest
     - name: run command in docker
-      run: docker run --rm -v $(pwd):/app -w /app yapro/apiration-bundle:latest composer install --optimize-autoloader --no-scripts --no-interaction
+      run: docker run --rm -v $(pwd):/app -w /app yapro/apiration-bundle:latest composer install --optimize-autoloader --no-scripts --no-interaction && vendor/bin/simple-phpunit --testsuite=Unit,Functional
 
 #    - uses: addnab/docker-run-action@v3
 #      with:
