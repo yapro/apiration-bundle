@@ -2,6 +2,8 @@
 
 The lib to cast a request to a Model object and cast a Model object to a response.
 
+![lib tests](https://github.com/yapro/apiration-bundle/actions/workflows/main.yml/badge.svg)
+
 ## Installation
 
 Add as a requirement in your `composer.json` file or run
