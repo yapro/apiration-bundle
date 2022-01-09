@@ -22,4 +22,5 @@ jobs:
     - run: pwd
     # run commands in docker:
     - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest composer install --optimize-autoloader --no-scripts --no-interaction
+    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest ls -la /tmp/composer-home
     - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest vendor/bin/simple-phpunit --testsuite=Unit,Functional
