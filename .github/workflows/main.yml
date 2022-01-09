@@ -15,7 +15,10 @@ jobs:
     steps:
     - name: "Checkout on commit in the repository"
       uses: actions/checkout@v2
-    - name: Build the Docker image
+    - name: "Build the Docker image"
       run: docker build -t yapro/apiration-bundle:latest -f ./Dockerfile ./
-    - name: run command in docker
+    - name: "run command in virtual machine"
+      run: echo $(pwd)
+    - run: echo $id
+    - name: "run command in docker"
       run: docker run --rm -v $(pwd):/app -w /app yapro/apiration-bundle:latest composer install --optimize-autoloader --no-scripts --no-interaction && vendor/bin/simple-phpunit --testsuite=Unit,Functional
