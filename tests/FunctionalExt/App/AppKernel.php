@@ -23,6 +23,9 @@ class AppKernel extends Kernel
             [
                 'secret' => 'S0ME_SECRET',
                 'test' => true,
+                'router' => [
+                    'utf8' => true,
+                ],
             ]
         );
 	    $container->services()
