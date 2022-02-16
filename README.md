@@ -6,7 +6,11 @@ The lib to cast a request to a Model object and cast a Model object to a respons
 
 ## Installation
 
-Add as a requirement in your `composer.json` file or run
+Add as a requirement in your `composer.json` file or run for prod:
+```sh
+composer require yapro/apiration-bundle yapro/marker-interfaces:dev-main laminas/laminas-code:3.4.1
+```
+For dev:
 ```sh
 composer require yapro/apiration-bundle dev-master
 ```
