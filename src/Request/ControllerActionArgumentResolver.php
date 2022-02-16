@@ -4,27 +4,17 @@ declare(strict_types=1);
 
 namespace YaPro\ApiRationBundle\Request;
 
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
 use YaPro\Helper\Validation\ScalarValidator;
-use function class_exists;
-use function class_implements;
-use function explode;
-use function in_array;
-use function is_string;
 use Laminas\Code\Reflection\ClassReflection;
 use Laminas\Code\Reflection\DocBlock\Tag\ParamTag;
 use Laminas\Code\Reflection\DocBlock\Tag\TagInterface;
 use YaPro\ApiRationBundle\Exception\BadRequestException;
-use function str_replace;
-use function strtolower;
-use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
-use Symfony\Component\Serializer\Encoder\JsonDecode;
-use Symfony\Component\Serializer\Exception\ExceptionInterface as SymfonySerializerException;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -197,70 +187,41 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
      */
     public function apply(Request $request, string $classNameWithNamespace)
     {
-        try {
-            if ($request->getMethod() === 'GET') {
+        if ($request->getMethod() === 'GET') {
+            try {
                 $array = $this->fixScalarData($request->query->all());
-                $object = $this->serializer->denormalize($array, $classNameWithNamespace);
-            } else {
-                $parameters = $this->getParametersFromRequest($request);
-                $object = $this->serializer->denormalize($parameters, $classNameWithNamespace);
+                $objectOrObjectCollection = $this->serializer->denormalize($array, $classNameWithNamespace);
+            } catch (ExceptionInterface $e) {
+                throw new BadRequestException('', [], $e);
             }
-            //} catch (UnsupportedFormatException $e) {
-            //    throw new UnsupportedMediaTypeHttpException($e->getMessage(), $e);
-            //} catch (JMSSerializerException $e) {
-            //    throw new BadRequestHttpException($e->getMessage(), $e);
-        } catch (SymfonySerializerException $e) {
-            throw new BadRequestHttpException($e->getMessage(), $e);
+        } else {
+            $objectOrObjectCollection = $this->getObjectOrObjectCollectionFromRequestBody(
+                $request,
+                $classNameWithNamespace
+            );
         }
-        $this->validate($object);
+        $this->validate($objectOrObjectCollection);
 
-        return $object;
+        return $objectOrObjectCollection;
     }
 
     /**
-     * @internal private
-     *
      * @param Request $request
-     * @return array
-     */
-    public function getParametersFromRequest(Request $request): array
-    {
-        $requestContentType = $request->getContentType() ?? 'json';
-
-        $query = $request->query;
-        $requestParameters = $request->request;
-        $attributes = $this->getPublicPathAttributes($request->attributes);
-        $content = $request->getContent();
-        // При POST запросе с `content-type: application/x-www-form-urlencoded` параметры, описанные в теле запроса,
-        // автоматически устанавливаются в магический $_POST, поэтому нам не следует десериализовывать теже самые
-        // параметры из тела запроса повторно. Плюс сериалайзер может не уметь дессериализовывать из этого content-type.
-        if (!empty($content) && 0 === $requestParameters->count()) {
-            $content = $this->serializer->decode($content, $requestContentType, [JsonDecode::ASSOCIATIVE => true]);
-        }
-        $content = is_array($content) ? $content : [];
-
-        return array_merge(
-            iterator_to_array($query),
-            $attributes,
-            iterator_to_array($requestParameters),
-            $content
-        );
-    }
-
-    /**
-     * Получить только те атрибуты, которые не имеют префикса "_", т.е. только публичные.
-     * По факту это будут значения slug из route'а.
+     * @param string $classNameWithNamespace
+     * @return mixed
+     * @throws BadRequestException
      * @internal private
+     * @link https://symfony.ru/doc/current/components/serializer.html#component-serializer-handling-circular-references-ru
+     *
      */
-    public function getPublicPathAttributes(ParameterBag $attributes): array
+    public function getObjectOrObjectCollectionFromRequestBody(Request $request, string $classNameWithNamespace)
     {
-        return array_filter(
-            iterator_to_array($attributes),
-            function ($key) {
-                return $key[0] !== '_';
-            },
-            ARRAY_FILTER_USE_KEY
-        );
+        try {
+            $requestContentType = str_ends_with($request->getContentType(), 'xml') || $request->getContentType() === 'text/html' ? 'xml' : 'json';
+            return $this->serializer->deserialize($request->getContent(), $classNameWithNamespace, $requestContentType);
+        } catch (NotNormalizableValueException $e) {
+            throw new BadRequestException('Deserialization problem', ['check the API contract' => $e->getMessage()], $e);
+        }
     }
 
     /**

@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use YaPro\Helper\JsonHelper;
+
 use function class_exists;
 
 class ExceptionResolver
@@ -31,10 +33,12 @@ class ExceptionResolver
     public const SEPARATOR_IN_MSG_ON_FOREIGN_CONSTRAINT_VIOLATION = 'referenced from table';
 
     private TranslatorInterface $translator;
+    private JsonHelper $jsonHelper;
 
-    public function __construct(TranslatorInterface $translator)
+    public function __construct(TranslatorInterface $translator, JsonHelper $jsonHelper)
     {
         $this->translator = $translator;
+        $this->jsonHelper = $jsonHelper;
     }
 
     // @todo написать if-ы на все эксепшены \Doctrine\DBAL\Driver\AbstractPostgreSQLDriver::convertException
@@ -92,7 +96,12 @@ class ExceptionResolver
         $response->headers->replace($headers);
         $response->setStatusCode($httpStatusCode);
         // за основу был взят RFC 7807 - https://tools.ietf.org/html/rfc7807 и немного переделан
-        $response->setContent($this->jsonEncodeResponseContent($message, $errors));
+        $response->setContent($this->jsonHelper->jsonEncode(
+            [
+                'message' => $message,
+                'errors' => $errors,
+            ]
+        ));
     }
 
     /**
@@ -148,22 +157,5 @@ class ExceptionResolver
         return class_exists('Doctrine\ORM\ORMInvalidArgumentException')
             && $exception instanceof \Doctrine\ORM\ORMInvalidArgumentException
             && mb_strpos($exception->getMessage(), self::ORM_INVALID_ARGUMENT_EXCEPTION_MESSAGE) === 0;
-    }
-
-    /**
-     * @param $message
-     * @param $errors
-     *
-     * @return false|string
-     */
-    private function jsonEncodeResponseContent($message, $errors)
-    {
-        return json_encode(
-            [
-                'message' => $message,
-                'errors' => $errors,
-            ],
-            JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
-        );
     }
 }

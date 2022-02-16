@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace YaPro\ApiRationBundle\Tests\Unit\Request;
 
-use Generator;
 use Laminas\Code\Reflection\DocBlock\Tag\ParamTag;
 use Laminas\Code\Reflection\DocBlock\Tag\ReturnTag;
 use Laminas\Code\Reflection\DocBlock\Tag\TagInterface;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use YaPro\ApiRationBundle\Exception\BadRequestException;
 use YaPro\ApiRationBundle\Request\ControllerActionArgumentResolver;
 use PHPUnit\Framework\TestCase;
@@ -16,8 +16,6 @@ use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -250,35 +248,40 @@ class ControllerActionArgumentResolverTest extends TestCase
     public function providerApply(): iterable
     {
         $requestMock = $this->createConfiguredMock(Request::class, [
-            'getContentType' => 'string',
-            'getContent' => 'content',
-            'getMethod' => 'POST',
-        ]);
-        yield [$requestMock];
-
-        $requestMock = $this->createConfiguredMock(Request::class, [
             'getContentType' => null,
             'getMethod' => 'GET',
         ]);
         $requestMock->query = new InputBag();
-        yield [$requestMock];
+        // Serializer потому что метода denormalize нет в SerializerInterface
+        yield [$requestMock, Serializer::class, 'denormalize'];
+        // не SerializerForMock потому что метода denormalize нет в SerializerForMock
+
+        $requestMock = $this->createConfiguredMock(Request::class, [
+            'getContentType' => 'string',
+            'getContent' => 'content',
+            'getMethod' => 'POST',
+        ]);
+        // SerializerForMock потому что Serializer::deserialize() помечен как final
+        yield [$requestMock, SerializerForMock::class, 'deserialize'];
     }
 
     /**
      * @dataProvider providerApply
      *
      * @param Request $requestMock
+     * @param string $serializerClassName
+     * @param string $serializerMethod
+     * @throws BadRequestException
      */
-    public function testApply(
-        Request $requestMock
-    ): void {
+    public function testApply(Request $requestMock, string $serializerClassName, string $serializerMethod): void
+    {
         $expected = new stdClass();
         $expected->property = 'value';
 
         $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
             ->setConstructorArgs([
-                $this->createConfiguredMock(Serializer::class, [
-                    'denormalize' => $expected,
+                $this->createConfiguredMock($serializerClassName, [
+                    $serializerMethod => $expected,
                 ]),
                 $this->createMock(ScalarValidator::class),
                 $this->createMock(ValidatorInterface::class),
@@ -286,20 +289,17 @@ class ControllerActionArgumentResolverTest extends TestCase
             ->setMethodsExcept(['apply'])
             ->getMock();
 
-        $resolver
-            ->expects($this->once())
-            ->method('validate')
-            ->with($expected);
+        $resolver->expects($this->once())->method('validate')->with($expected);
+        $resolver->method('getObjectOrObjectCollectionFromRequestBody')->willReturn($expected);
 
         $actual = $resolver->apply($requestMock, 'AnyClassNameWithNamespace');
         $this->assertSame($expected, $actual);
     }
 
-    public function testApplyThrowException(): void {
-
-        $exception = $this->createMock(ExceptionInterface::class);
+    public function testApplyThrowException(): void
+    {
         $serializerMock = $this->createMock(Serializer::class);
-        $serializerMock->method('denormalize')->willThrowException($exception);
+        $serializerMock->method('denormalize')->willThrowException($this->createMock(ExceptionInterface::class));
 
         $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
             ->setConstructorArgs([
@@ -310,14 +310,42 @@ class ControllerActionArgumentResolverTest extends TestCase
             ->setMethodsExcept(['apply'])
             ->getMock();
 
-        $resolver
-            ->expects($this->never())
-            ->method('validate');
-        $this->expectException(BadRequestHttpException::class);
+        $resolver->expects($this->never())->method('validate');
+        $this->expectException(BadRequestException::class);
 
-        $requestMock = $this->createMock(Request::class);
+        $request = $this->createMock(Request::class);
+        $request->method('getMethod')->willReturn('GET');
+        // динамично создаем объект, т.к. InputBag помечен как final
+        $request->query = new class() {
+            function all()
+            {
+                return [];
+            }
+        };
 
-        $resolver->apply($requestMock, 'AnyClassNameWithNamespace');
+        $resolver->apply($request, 'AnyClassNameWithNamespace');
+    }
+
+    public function testGetObjectOrObjectCollectionFromRequestBody()
+    {
+        $expected = mt_rand();
+        $serializer = $this->createMock(SerializerForMock::class);
+        $serializer->method('deserialize')->willReturn($expected);
+
+        $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
+            ->setConstructorArgs([
+                $serializer,
+                $this->createMock(ScalarValidator::class),
+                $this->createMock(ValidatorInterface::class),
+            ])
+            ->setMethodsExcept(['getObjectOrObjectCollectionFromRequestBody'])
+            ->getMock();
+
+        $request = $this->createMock(Request::class);
+        //$request->method('getMethod')->willReturn('GET');
+
+        $actual = $resolver->getObjectOrObjectCollectionFromRequestBody($request, 'AnyClassNameWithNamespace');
+        $this->assertSame($expected, $actual);
     }
 
     public function providerGetClassNameWithNamespace(): array
@@ -612,149 +640,6 @@ class ControllerActionArgumentResolverTest extends TestCase
 
         $actual = $resolver->findFullClassNamespace($className, $classNameSpace);
         $this->assertSame($expected, $actual);
-    }
-
-    public function providerGetParametersFromRequest(): Generator
-    {
-        $defaultContentType = 'json';
-        yield [
-            'request' => new Request(),
-            'paramsFromRequestContent' => [],
-            'expected' => [],
-        ];
-
-        $query = ['some_query_var' => 'some_query_var_value'];
-        yield [
-            'request' => new Request($query),
-            'paramsFromRequestContent' => [],
-            'expected' => $query,
-        ];
-
-        $content = ['some_content_var' => 'some_content_var_value'];
-        yield [
-            'request' => new Request($query, [], [], [], [], ['CONTENT_TYPE' => $defaultContentType], json_encode($content, JSON_THROW_ON_ERROR)),
-            'paramsFromRequestContent' => $content,
-            'expected' => ['some_query_var' => 'some_query_var_value', 'some_content_var' => 'some_content_var_value'],
-        ];
-
-        $request = new Request($query, [], [], [], [], ['CONTENT_TYPE' => 'jsonld'], json_encode($content, JSON_THROW_ON_ERROR));
-        // установим content-type отличный от значения "по умолчанию", проверяя что парсинг параметров не привязан к конкретному формату
-        //$request->headers->set('content-type', 'application/ld+json');
-        yield [
-            'request' => $request,
-            'paramsFromRequestContent' => $content,
-            'expected' => ['some_query_var' => 'some_query_var_value', 'some_content_var' => 'some_content_var_value'],
-        ];
-
-        $postParams = ['some_post_var' => 'some_post_var_value'];
-        yield [
-            'request' => new Request($query, $postParams, [], [], [], ['CONTENT_TYPE' => $defaultContentType], json_encode($content, JSON_THROW_ON_ERROR)),
-            'paramsFromRequestContent' => $content,
-            'expected' => [
-                'some_query_var' => 'some_query_var_value',
-                'some_post_var' => 'some_post_var_value',
-            ],
-        ];
-
-        // Проверим что приоритет параметров в методе не изменен, например когда параметры в
-        // query будут иметь одно и тоже имя, что и в content или attributes
-        $query = [
-            'some_query_var' => 'query',
-            'some_query_var1' => 'query',
-            'some_query_var2' => 'query',
-            'some_query_var3' => 'query',
-        ];
-        $attributes = [
-            'some_attr_var' => 'attributes',
-            'some_attr_var1' => 'attributes',
-            'some_attr_var2' => 'attributes',
-            'some_query_var1' => 'attributes',
-        ];
-        $postParams = [
-            'some_post_var' => 'postParams',
-            'some_post_var1' => 'postParams',
-            'some_attr_var1' => 'postParams',
-            'some_query_var2' => 'postParams',
-        ];
-        $content = [
-            'some_content_var' => 'content',
-            'some_attr_var2' => 'content',
-            'some_post_var1' => 'content',
-            'some_query_var3' => 'content',
-        ];
-        yield [
-            'request' => new Request($query, $postParams, $attributes, [], [], ['CONTENT_TYPE' => $defaultContentType], json_encode($content, JSON_THROW_ON_ERROR)),
-            'paramsFromRequestContent' => $content,
-            'expected' => [
-                'some_query_var' => 'query',
-                'some_query_var1' => 'attributes',
-                'some_query_var2' => 'postParams',
-                'some_query_var3' => 'query',
-                'some_attr_var' => 'attributes',
-                'some_attr_var1' => 'postParams',
-                'some_attr_var2' => 'attributes',
-                'some_post_var' => 'postParams',
-                'some_post_var1' => 'postParams',
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider providerGetParametersFromRequest
-     *
-     * @param Request $request
-     * @param array   $paramsFromRequestContent
-     * @param array   $expected
-     */
-    public function testGetParametersFromRequest(
-        Request $request,
-        array $paramsFromRequestContent,
-        array $expected
-    ): void {
-        $serializer = $this->createConfiguredMock(SerializerForMock::class, [
-            'decode' => $paramsFromRequestContent,
-        ]);
-        $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
-            ->disableOriginalConstructor()
-            ->setMethodsExcept(['getParametersFromRequest'])
-            ->getMock();
-
-        $resolver->method('getPublicPathAttributes')->willReturn($request->attributes->all());
-        $this->setClassPropertyValue($resolver, 'serializer', $serializer);
-
-        $actual = $resolver->getParametersFromRequest($request);
-        self::assertSame($expected, $actual);
-    }
-
-    public function providerGetPublicPathAttributes(): Generator
-    {
-        yield [
-            'attributes' => new ParameterBag(),
-            'expected' => [],
-        ];
-
-        yield [
-            'attributes' => new ParameterBag(['_private_var' => 'some_value', 'public_var' => 'some_value2']),
-            'expected' => ['public_var' => 'some_value2'],
-        ];
-    }
-
-    /**
-     * @dataProvider providerGetPublicPathAttributes
-     *
-     * @param ParameterBag $attributes
-     * @param array        $expected
-     */
-    public function testGetPublicPathAttributes(ParameterBag $attributes, array $expected): void
-    {
-        $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
-            ->disableOriginalConstructor()
-            ->setMethodsExcept(['getPublicPathAttributes'])
-            ->getMock();
-
-        $result = $resolver->getPublicPathAttributes($attributes);
-
-        self::assertSame($expected, $result);
     }
 
     public function testGetClassNameWithNameSpaceForApply(): void

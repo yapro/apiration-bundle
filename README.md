@@ -8,7 +8,7 @@ The lib to cast a request to a Model object and cast a Model object to a respons
 
 Add as a requirement in your `composer.json` file or run for prod:
 ```sh
-composer require yapro/apiration-bundle yapro/marker-interfaces:dev-main laminas/laminas-code:3.4.1
+composer require yapro/apiration-bundle laminas/laminas-code:3.4.1
 ```
 For dev:
 ```sh
@@ -52,5 +52,5 @@ XDEBUG_SESSION=common \
 XDEBUG_MODE=debug \
 XDEBUG_CONFIG="max_nesting_level=200 client_port=9003 client_host=host.docker.internal" \
 vendor/bin/simple-phpunit --cache-result-file=/tmp/phpunit.cache -v --stderr --stop-on-incomplete --stop-on-defect \
---stop-on-failure --stop-on-warning --fail-on-warning --stop-on-risky --fail-on-risky tests/Functional/Api
+--stop-on-failure --stop-on-warning --fail-on-warning --stop-on-risky --fail-on-risky --testsuite=Unit,Functional
 ```

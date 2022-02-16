@@ -14,7 +14,7 @@
   ],
   "require": {
     "php": "7.4.*",
-    "yapro/marker-interfaces": "dev-main",
+    "yapro/marker-interfaces": "*",
     "symfony/event-dispatcher": "*",
     "symfony/http-foundation": "*",
     "symfony/http-kernel": "*",

@@ -60,4 +60,37 @@ class JsonTest extends BaseTestCase
         ]);
         $this->assertJsonResponse('{"wife":{"name":"Barbie"},"kids":[{"name":"Todd"},{"name":"Stacie"}],"surname":"","city":"","name":"Ken"}');
     }
+
+    public function testErrorsApiContract(): void
+    {
+        $this->put('/api-json-test/family', [
+            'name' => 'Ken',
+            'wife' => [
+                'name' => 'Barbie',
+            ],
+            'kids' => [
+                // boy
+                [
+                    'name' => 123, // wrong type
+                ],
+                // girl
+                [
+                    'name' => 'Stacie',
+                ],
+            ],
+        ]);
+        $this->assertJsonResponse(trim('
+            {
+                "message": "Deserialization problem",
+                "errors": [
+                    {
+                        "fieldName": "check the API contract",
+                        "messages": [
+                            "The type of the \"name\" attribute for class \"YaPro\\\ApiRationBundle\\\Tests\\\FunctionalExt\\\App\\\JsonConvertModel\\\DollModel\" must be one of \"string\" (\"int\" given)."
+                        ]
+                    }
+                ]
+            }
+        '));
+    }
 }

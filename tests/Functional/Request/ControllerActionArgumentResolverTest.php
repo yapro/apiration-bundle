@@ -81,10 +81,10 @@ class ControllerActionArgumentResolverTest extends KernelTestCase
         $expectedKenModel = new KenModel($name, $wife, $kids, $surname, $city);
 
         yield [
-            'query' => ['name' => $name, 'surname' => $surname],
+            'query' => ['name' => 'value will be ignored', 'surname' => 'value will be ignored too'],
             'request' => [],
-            'attributes' => ['city' => $city],
-            'content' => ['wife' => $wife, 'kids' => $kids],
+            'attributes' => ['city' => 'and the value will be ignored'],
+            'content' => ['wife' => $wife, 'kids' => $kids, 'name' => $name, 'surname' => $surname, 'city' => $city],
             'expectedKenModel' => $expectedKenModel,
         ];
     }

@@ -22,6 +22,7 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
+use YaPro\Helper\JsonHelper;
 use YaPro\Helper\LiberatorTrait;
 
 class ExceptionResolverTest extends TestCase
@@ -175,7 +176,7 @@ class ExceptionResolverTest extends TestCase
             TranslatorInterface::class,
             ['trans' => $event->getThrowable()->getMessage()]
         );
-        $exceptionResolver = new ExceptionResolver($translator);
+        $exceptionResolver = new ExceptionResolver($translator, new JsonHelper());
 
         $exceptionResolver->onKernelException($event);
 
@@ -184,33 +185,6 @@ class ExceptionResolverTest extends TestCase
             $request->setDate($expectedResponse->getDate());
         }
         self::assertEquals($expectedResponse, $request);
-    }
-
-    public function providerJsonEncodeResponseContent(): Generator
-    {
-        $message = 'some message';
-        $errors = ['€', 'http://example.com/some/cool/page'];
-        yield [
-            'message' => $message,
-            'errors' => $errors,
-            'expect' => json_encode(
-                ['message' => $message, 'errors' => $errors],
-                JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
-            ),
-        ];
-    }
-
-    /**
-     * @param string $message
-     * @param array  $errors
-     * @param string $expect
-     * @dataProvider providerJsonEncodeResponseContent
-     */
-    public function testJsonEncodeResponseContent(string $message, array $errors, string $expect): void
-    {
-        $exceptionResolver = new ExceptionResolver($this->createMock(TranslatorInterface::class));
-        $actual = $this->callClassMethod($exceptionResolver, 'jsonEncodeResponseContent', [$message, $errors]);
-        self::assertSame($expect, $actual);
     }
 
     public function providerIsDuplicateRowInDatabase(): Generator
@@ -236,7 +210,7 @@ class ExceptionResolverTest extends TestCase
      */
     public function testIsDuplicateRowInDatabase(Throwable $exception, bool $expect): void
     {
-        $exceptionResolver = new ExceptionResolver($this->createMock(TranslatorInterface::class));
+        $exceptionResolver = new ExceptionResolver($this->createMock(TranslatorInterface::class), $this->createMock(JsonHelper::class));
         $actual = $this->callClassMethod($exceptionResolver, 'isDuplicateRowInDatabase', [$exception]);
         self::assertSame($expect, $actual);
     }
@@ -264,7 +238,7 @@ class ExceptionResolverTest extends TestCase
      */
     public function testIsORMInvalidArgumentException(Throwable $exception, bool $expect): void
     {
-        $exceptionResolver = new ExceptionResolver($this->createMock(TranslatorInterface::class));
+        $exceptionResolver = new ExceptionResolver($this->createMock(TranslatorInterface::class), $this->createMock(JsonHelper::class));
         $actual = $this->callClassMethod($exceptionResolver, 'isORMInvalidArgumentException', [$exception]);
         self::assertSame($expect, $actual);
     }
