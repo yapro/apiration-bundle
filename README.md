@@ -10,7 +10,7 @@ Add as a requirement in your `composer.json` file or run for prod:
 ```sh
 composer require yapro/apiration-bundle laminas/laminas-code:3.4.1
 ```
-For dev:
+As dev:
 ```sh
 composer require yapro/apiration-bundle dev-master
 ```
@@ -53,4 +53,14 @@ XDEBUG_MODE=debug \
 XDEBUG_CONFIG="max_nesting_level=200 client_port=9003 client_host=host.docker.internal" \
 vendor/bin/simple-phpunit --cache-result-file=/tmp/phpunit.cache -v --stderr --stop-on-incomplete --stop-on-defect \
 --stop-on-failure --stop-on-warning --fail-on-warning --stop-on-risky --fail-on-risky --testsuite=Unit,Functional
+```
+
+Cs-Fixer:
+```sh
+docker run --user=1000:1000 --rm -v $(pwd):/app -w /app yapro/apiration-bundle:latest ./php-cs-fixer.phar fix --config=.php-cs-fixer.dist.php -v --using-cache=no --allow-risky=yes
+```
+
+Update phpmd rules:
+```shell
+docker run --user=1000:1000 --rm -v $(pwd):/app -w /app yapro/apiration-bundle:latest ./phpmd.phar . text phpmd.xml --exclude .github/workflows,vendor --strict --generate-baseline
 ```

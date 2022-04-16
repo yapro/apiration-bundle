@@ -3,7 +3,6 @@
   "type": "library",
   "description": "Api tool",
   "keywords": ["php", "api", "tool"],
-  "license": "proprietary",
   "authors": [
     {
       "name": "Lebedenko Nikolay",

@@ -20,7 +20,11 @@ jobs:
     # run command in virtual machine
     - run: id
     - run: pwd
+    - run: wget https://github.com/phpmd/phpmd/releases/download/2.12.0/phpmd.phar && chmod +x ./phpmd.phar
+    - run: wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.8.0/php-cs-fixer.phar && chmod +x ./php-cs-fixer.phar
     # run commands in docker:
+    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest ./phpmd.phar . text phpmd.xml --exclude .github/workflows,vendor --strict
+    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest ./php-cs-fixer.phar fix --config=.php_cs.dist -v --dry-run --stop-on-violation --using-cache=no --allow-risky=yes --diff
     - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest ls -la /tmp/composer-home
     - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest composer install --optimize-autoloader --no-scripts --no-interaction
     - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest vendor/bin/simple-phpunit --testsuite=Unit,Functional
