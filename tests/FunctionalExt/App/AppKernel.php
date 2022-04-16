@@ -1,22 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace YaPro\ApiRationBundle\Tests\FunctionalExt\App;
 
-use YaPro\ApiRationBundle\ApiRationBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
-
-use function mkdir;
-use function mt_rand;
+use YaPro\ApiRationBundle\ApiRationBundle;
 
 class AppKernel extends Kernel
 {
     use MicroKernelTrait;
 
-	public function configureContainer(ContainerConfigurator $container): void
+    public function configureContainer(ContainerConfigurator $container): void
     {
         $container->extension(
             'framework',
@@ -28,7 +27,7 @@ class AppKernel extends Kernel
                 ],
             ]
         );
-	    $container->services()
+        $container->services()
             ->load('YaPro\\ApiRationBundle\\Tests\\FunctionalExt\\App\\Controller\\', __DIR__ . '/Controller/*')
             ->autowire()
             ->autoconfigure();
@@ -43,7 +42,7 @@ class AppKernel extends Kernel
     {
         return [
             new FrameworkBundle(),
-            new ApiRationBundle()
+            new ApiRationBundle(),
         ];
     }
 

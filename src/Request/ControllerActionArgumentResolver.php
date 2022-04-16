@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace YaPro\ApiRationBundle\Request;
 
-use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
-use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
-use YaPro\Helper\Validation\ScalarValidator;
 use Laminas\Code\Reflection\ClassReflection;
 use Laminas\Code\Reflection\DocBlock\Tag\ParamTag;
 use Laminas\Code\Reflection\DocBlock\Tag\TagInterface;
-use YaPro\ApiRationBundle\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use YaPro\ApiRationBundle\Exception\BadRequestException;
+use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
+use YaPro\Helper\Validation\ScalarValidator;
 
 /**
  * Если в Controller::action() в качестве параметра указан ApiRationObjectInterface-объект, то запрос будет преобразован в
@@ -65,6 +65,7 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
      *
      * @param string $controllerActionFunction
      * @param string $argumentName
+     *
      * @return string
      */
     public function getClassNameWithNamespace(string $controllerActionFunction, string $argumentName): string
@@ -89,8 +90,9 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
     /**
      * @internal private
      *
-     * @param string $argumentName
+     * @param string         $argumentName
      * @param TagInterface[] $docBlockTags
+     *
      * @return string
      */
     public function findShortClassName(string $argumentName, array $docBlockTags): string
@@ -136,10 +138,12 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
             && $classNameWithNamespace = $this->getClassNameWithNamespace($controllerActionFunction, $argument->getName())
         ) {
             yield $this->apply($request, $this->getClassNameWithNamespaceForApply($classNameWithNamespace));
+
             return;
         }
         if ($this->isApiRationObjectInterface($argument->getType())) {
             yield $this->apply($request, $argument->getType());
+
             return;
         }
         yield null;
@@ -181,8 +185,10 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
      * @internal private
      *
      * @param Request $request
-     * @param string $classNameWithNamespace
+     * @param string  $classNameWithNamespace
+     *
      * @return mixed
+     *
      * @throws BadRequestException
      */
     public function apply(Request $request, string $classNameWithNamespace)
@@ -207,17 +213,21 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
 
     /**
      * @param Request $request
-     * @param string $classNameWithNamespace
-     * @return mixed
-     * @throws BadRequestException
-     * @internal private
-     * @link https://symfony.ru/doc/current/components/serializer.html#component-serializer-handling-circular-references-ru
+     * @param string  $classNameWithNamespace
      *
+     * @return mixed
+     *
+     * @throws BadRequestException
+     *
+     * @internal private
+     *
+     * @see https://symfony.ru/doc/current/components/serializer.html#component-serializer-handling-circular-references-ru
      */
     public function getObjectOrObjectCollectionFromRequestBody(Request $request, string $classNameWithNamespace)
     {
         try {
             $requestContentType = str_ends_with($request->getContentType(), 'xml') || $request->getContentType() === 'text/html' ? 'xml' : 'json';
+
             return $this->serializer->deserialize($request->getContent(), $classNameWithNamespace, $requestContentType);
         } catch (NotNormalizableValueException $e) {
             throw new BadRequestException('Deserialization problem', ['check the API contract' => $e->getMessage()], $e);
@@ -226,7 +236,9 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
 
     /**
      * @internal private
+     *
      * @param $classNameWithNamespace
+     *
      * @return bool
      */
     public function isApiRationObjectInterface($classNameWithNamespace): bool
@@ -249,7 +261,9 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
 
     /**
      * @internal private
+     *
      * @param array $params
+     *
      * @return array
      */
     public function fixScalarData(array $params): array

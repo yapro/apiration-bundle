@@ -7,24 +7,24 @@ namespace YaPro\ApiRationBundle\Tests\Unit\Request;
 use Laminas\Code\Reflection\DocBlock\Tag\ParamTag;
 use Laminas\Code\Reflection\DocBlock\Tag\ReturnTag;
 use Laminas\Code\Reflection\DocBlock\Tag\TagInterface;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
-use YaPro\ApiRationBundle\Exception\BadRequestException;
-use YaPro\ApiRationBundle\Request\ControllerActionArgumentResolver;
 use PHPUnit\Framework\TestCase;
+use function rand;
 use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use YaPro\ApiRationBundle\Exception\BadRequestException;
+use YaPro\ApiRationBundle\Request\ControllerActionArgumentResolver;
 use YaPro\Helper\LiberatorTrait;
 use YaPro\Helper\Validation\ScalarValidator;
-use function rand;
 
 class ControllerActionArgumentResolverTest extends TestCase
 {
@@ -50,7 +50,7 @@ class ControllerActionArgumentResolverTest extends TestCase
      * @dataProvider providerSupports
      *
      * @param string $argumentType
-     * @param bool $expected
+     * @param bool   $expected
      */
     public function testSupports(string $argumentType, bool $expected): void
     {
@@ -115,6 +115,7 @@ class ControllerActionArgumentResolverTest extends TestCase
     public function providerFixScalarData(): array
     {
         $filterValue = 12345;
+
         return [
             [
                 'filterValue' => $filterValue,
@@ -133,7 +134,7 @@ class ControllerActionArgumentResolverTest extends TestCase
     /**
      * @dataProvider providerFixScalarData
      *
-     * @param int $filterValue
+     * @param int   $filterValue
      * @param array $params
      * @param array $expected
      */
@@ -269,8 +270,9 @@ class ControllerActionArgumentResolverTest extends TestCase
      * @dataProvider providerApply
      *
      * @param Request $requestMock
-     * @param string $serializerClassName
-     * @param string $serializerMethod
+     * @param string  $serializerClassName
+     * @param string  $serializerMethod
+     *
      * @throws BadRequestException
      */
     public function testApply(Request $requestMock, string $serializerClassName, string $serializerMethod): void
@@ -317,7 +319,7 @@ class ControllerActionArgumentResolverTest extends TestCase
         $request->method('getMethod')->willReturn('GET');
         // динамично создаем объект, т.к. InputBag помечен как final
         $request->query = new class() {
-            function all()
+            public function all()
             {
                 return [];
             }
@@ -342,7 +344,7 @@ class ControllerActionArgumentResolverTest extends TestCase
             ->getMock();
 
         $request = $this->createMock(Request::class);
-        //$request->method('getMethod')->willReturn('GET');
+        // $request->method('getMethod')->willReturn('GET');
 
         $actual = $resolver->getObjectOrObjectCollectionFromRequestBody($request, 'AnyClassNameWithNamespace');
         $this->assertSame($expected, $actual);
@@ -425,17 +427,17 @@ class ControllerActionArgumentResolverTest extends TestCase
                 'argument' => $this->createMock(ArgumentMetadata::class),
                 'isApiRationObjectInterface' => false, // variable not used,
                 'expected' => null,
-            ]
+            ],
         ];
     }
 
     /**
      * @dataProvider providerResolve
      *
-     * @param Request $request
+     * @param Request          $request
      * @param ArgumentMetadata $argument
-     * @param bool $isApiRationObjectInterface
-     * @param string|null $expected
+     * @param bool             $isApiRationObjectInterface
+     * @param string|null      $expected
      */
     public function testResolve(
         Request $request,

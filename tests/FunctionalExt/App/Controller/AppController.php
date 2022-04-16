@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace YaPro\ApiRationBundle\Tests\FunctionalExt\App\Controller;
@@ -82,6 +83,7 @@ class AppController extends AbstractController
 
     /**
      * @Route("/login", name="app_login", methods={"POST"})
+     *
      * @return JsonResponse|Response
      */
     public function login(): JsonResponse
@@ -89,7 +91,7 @@ class AppController extends AbstractController
         return $this->json(
             [
                 'id' => 123,
-                'email' =>  'name@yapro.ru',
+                'email' => 'name@yapro.ru',
             ]);
     }
 }

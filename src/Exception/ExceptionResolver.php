@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace YaPro\ApiRationBundle\Exception;
 
+use function class_exists;
 use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
-use YaPro\ApiRationBundle\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use YaPro\Helper\JsonHelper;
-
-use function class_exists;
 
 class ExceptionResolver
 {

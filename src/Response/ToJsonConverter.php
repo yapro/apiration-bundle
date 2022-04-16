@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace YaPro\ApiRationBundle\Response;
 
-use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
+use function is_array;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\Serializer\SerializerInterface;
-
-use function is_array;
+use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
 
 /**
  * Возвращаемый Controller::action()-ом объект преобразует в Json-структуру.
  */
 class ToJsonConverter
 {
-    const JSON = 'application/json';
-    const LD_JSON = 'application/ld+json';
-    const CONTENT_TYPE = 'Content-Type';
-    const UNSUPPORTED = 'unsupported';
+    public const JSON = 'application/json';
+    public const LD_JSON = 'application/ld+json';
+    public const CONTENT_TYPE = 'Content-Type';
+    public const UNSUPPORTED = 'unsupported';
     private SerializerInterface $serializer;
 
     public function __construct(

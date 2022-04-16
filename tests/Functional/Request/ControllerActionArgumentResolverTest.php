@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace YaPro\ApiRationBundle\Tests\Functional\Request;
 
 use Generator;
-use YaPro\ApiRationBundle\Exception\BadRequestException;
-use YaPro\ApiRationBundle\Request\ControllerActionArgumentResolver;
-use YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel\DollModel;
-use YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel\KenModel;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use YaPro\ApiRationBundle\Exception\BadRequestException;
+use YaPro\ApiRationBundle\Request\ControllerActionArgumentResolver;
+use YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel\DollModel;
+use YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel\KenModel;
 use YaPro\Helper\Validation\ScalarValidator;
 
 class ControllerActionArgumentResolverTest extends KernelTestCase

@@ -165,7 +165,7 @@ class ExceptionResolverTest extends TestCase
     }
 
     /**
-     * @param ExceptionEvent $event
+     * @param ExceptionEvent    $event
      * @param JsonResponse|null $expectedResponse
      * @dataProvider providerOnKernelException
      */

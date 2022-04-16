@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace YaPro\ApiRationBundle\Response\JsonLd;
 
 use ArrayObject;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use UnexpectedValueException;
 
 class CollectionJsonLdResponse extends JsonResponse
@@ -16,8 +16,8 @@ class CollectionJsonLdResponse extends JsonResponse
     public const TOTAL_ITEMS = 'hydra:totalItems';
     public const DEFAULT_PAGE = 0;
     public const ITEMS_PER_PAGE = 10;
-    const PAGE_FIELD = 'page';
-    const ITEMS_PER_PAGE_FIELD = 'itemsPerPage';
+    public const PAGE_FIELD = 'page';
+    public const ITEMS_PER_PAGE_FIELD = 'itemsPerPage';
 
     private Request $request;
     private int $page = 0;
@@ -85,7 +85,7 @@ class CollectionJsonLdResponse extends JsonResponse
     public function getDataArrayObject(array $items = [], int $totalItems = 0): ArrayObject
     {
         $result = new ArrayObject([
-            "@type" => "hydra:Collection",
+            '@type' => 'hydra:Collection',
             self::ITEMS => $items,
             self::TOTAL_ITEMS => $totalItems,
         ]);
