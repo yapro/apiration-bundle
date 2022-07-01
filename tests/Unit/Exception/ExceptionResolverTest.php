@@ -103,7 +103,7 @@ class ExceptionResolverTest extends TestCase
             ),
             'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS,
-                Response::HTTP_OK,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
                 ExceptionResolver::MSG_ON_ORM_INVALID_ARGUMENT,
                 ExceptionResolver::DEFAULT_ERRORS
             ),
@@ -118,7 +118,7 @@ class ExceptionResolverTest extends TestCase
             ),
             'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS,
-                Response::HTTP_OK,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
                 sprintf(ExceptionResolver::MSG_ON_FOREIGN_CONSTRAINT_VIOLATION, ' - error occurred'),
                 ExceptionResolver::DEFAULT_ERRORS
             ),
@@ -136,7 +136,7 @@ class ExceptionResolverTest extends TestCase
             ),
             'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS,
-                Response::HTTP_OK,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
                 sprintf(ExceptionResolver::MSG_ON_FOREIGN_CONSTRAINT_VIOLATION, ' some_field_name'),
                 ExceptionResolver::DEFAULT_ERRORS
             ),

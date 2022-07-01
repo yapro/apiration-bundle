@@ -21,7 +21,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use Throwable;
 use YaPro\ApiRationBundle\Exception\BadRequestException as OperationBadRequestException;
 use YaPro\ApiRationBundle\Exception\ExceptionResolver;
-use YaPro\ApiRationBundle\Exception\NotFoundException;
 use YaPro\Helper\JsonHelper;
 use YaPro\Helper\LiberatorTrait;
 
@@ -39,7 +38,7 @@ class ExceptionResolverTest extends TestCase
                 HttpKernelInterface::MASTER_REQUEST,
                 new Exception($exceptionMsg)
             ),
-            'expectedRequest' => null,
+            'expectedResponse' => null,
         ];
 
         $exception = new OperationBadRequestException(
@@ -69,7 +68,7 @@ class ExceptionResolverTest extends TestCase
                         HttpKernelInterface::MASTER_REQUEST,
                         new NotFoundException($exceptionMsg)
                     ),
-                    'expectedRequest' => $this->createJsonResponse(
+                    'expectedResponse' => $this->createJsonResponse(
                         ExceptionResolver::DEFAULT_HEADERS,
                         Response::HTTP_OK,
                         $exceptionMsg,
@@ -86,7 +85,7 @@ class ExceptionResolverTest extends TestCase
                 HttpKernelInterface::MASTER_REQUEST,
                 new UniqueConstraintViolationException($exceptionMsg, (new PDOException($pdoException)))
             ),
-            'expectedRequest' => $this->createJsonResponse(
+            'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS,
                 Response::HTTP_CONFLICT,
                 ExceptionResolver::MSG_ON_DUPLICATE_ROWS,
@@ -101,9 +100,9 @@ class ExceptionResolverTest extends TestCase
                 HttpKernelInterface::MASTER_REQUEST,
                 new ORMInvalidArgumentException(ExceptionResolver::ORM_INVALID_ARGUMENT_EXCEPTION_MESSAGE)
             ),
-            'expectedRequest' => $this->createJsonResponse(
+            'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS,
-                Response::HTTP_OK,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
                 ExceptionResolver::MSG_ON_ORM_INVALID_ARGUMENT,
                 ExceptionResolver::DEFAULT_ERRORS
             ),
@@ -116,9 +115,9 @@ class ExceptionResolverTest extends TestCase
                 HttpKernelInterface::MASTER_REQUEST,
                 new ForeignKeyConstraintViolationException($exceptionMsg, (new PDOException($pdoException)))
             ),
-            'expectedRequest' => $this->createJsonResponse(
+            'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS,
-                Response::HTTP_OK,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
                 sprintf(ExceptionResolver::MSG_ON_FOREIGN_CONSTRAINT_VIOLATION, ' - error occurred'),
                 ExceptionResolver::DEFAULT_ERRORS
             ),
@@ -134,9 +133,9 @@ class ExceptionResolverTest extends TestCase
                     (new PDOException($pdoException))
                 )
             ),
-            'expectedRequest' => $this->createJsonResponse(
+            'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS,
-                Response::HTTP_OK,
+                Response::HTTP_UNPROCESSABLE_ENTITY,
                 sprintf(ExceptionResolver::MSG_ON_FOREIGN_CONSTRAINT_VIOLATION, ' some_field_name'),
                 ExceptionResolver::DEFAULT_ERRORS
             ),
@@ -155,7 +154,7 @@ class ExceptionResolverTest extends TestCase
                 HttpKernelInterface::MASTER_REQUEST,
                 $httpExceptionMock
             ),
-            'expectedRequest' => $this->createJsonResponse(
+            'expectedResponse' => $this->createJsonResponse(
                 ExceptionResolver::DEFAULT_HEADERS + $additionalHeaders,
                 $statusCode,
                 Response::$statusTexts[$statusCode],
@@ -180,11 +179,11 @@ class ExceptionResolverTest extends TestCase
 
         $exceptionResolver->onKernelException($event);
 
-        $request = $event->getResponse();
+        $response = $event->getResponse();
         if (null !== $expectedResponse) {
-            $request->setDate($expectedResponse->getDate());
+            $response->setDate($expectedResponse->getDate());
         }
-        self::assertEquals($expectedResponse, $request);
+        self::assertEquals($expectedResponse, $response);
     }
 
     public function providerIsDuplicateRowInDatabase(): Generator

@@ -64,6 +64,7 @@ class ExceptionResolver
         // должен знать, но пытается создать сущности используя связи графа, поэтому возникает эксепшен, который по
         // факту точно не 500-ая ошибка:
         } elseif ($this->isORMInvalidArgumentException($exception)) {
+            $httpStatusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
             $message = self::MSG_ON_ORM_INVALID_ARGUMENT;
         } elseif ($exception instanceof ForeignKeyConstraintViolationException) {
             $httpStatusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
