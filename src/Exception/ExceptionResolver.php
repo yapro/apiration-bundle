@@ -66,6 +66,7 @@ class ExceptionResolver
         } elseif ($this->isORMInvalidArgumentException($exception)) {
             $message = self::MSG_ON_ORM_INVALID_ARGUMENT;
         } elseif ($exception instanceof ForeignKeyConstraintViolationException) {
+            $httpStatusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
             $tableName = explode(self::SEPARATOR_IN_MSG_ON_FOREIGN_CONSTRAINT_VIOLATION, $exception->getMessage());
             $message = sprintf(
                 self::MSG_ON_FOREIGN_CONSTRAINT_VIOLATION,
