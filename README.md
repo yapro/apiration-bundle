@@ -4,7 +4,7 @@ The lib to cast a request to a Model object and cast a Model object to a respons
 
 ![lib tests](https://github.com/yapro/apiration-bundle/actions/workflows/main.yml/badge.svg)
 
-## Installation
+## Installation on PHP 7
 
 Add as a requirement in your `composer.json` file or run for prod:
 ```sh
