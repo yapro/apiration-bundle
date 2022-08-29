@@ -13,8 +13,9 @@ class SerializerForMock implements SerializerInterface
      *
      * @return string
      */
-    public function serialize($data, string $format, array $context = [])
+    public function serialize(mixed $data, string $format, array $context = []): string
     {
+        return '';
     }
 
     /**
@@ -22,8 +23,9 @@ class SerializerForMock implements SerializerInterface
      *
      * @return string
      */
-    public function deserialize($data, string $type, string $format, array $context = [])
+    public function deserialize(mixed $data, string $type, string $format, array $context = []): mixed
     {
+        return '';
     }
 
     public function decode()

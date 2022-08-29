@@ -8,6 +8,7 @@ use Laminas\Code\Reflection\DocBlock\Tag\ParamTag;
 use Laminas\Code\Reflection\DocBlock\Tag\ReturnTag;
 use Laminas\Code\Reflection\DocBlock\Tag\TagInterface;
 use PHPUnit\Framework\TestCase;
+use YaPro\Helper\FileHelper;
 use function rand;
 use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -182,7 +183,8 @@ class ControllerActionArgumentResolverTest extends TestCase
         $argumentResolver = new ControllerActionArgumentResolver(
             $this->createMock(SerializerInterface::class),
             $this->createMock(ScalarValidator::class),
-            $validatorMock
+            $validatorMock,
+            $this->createMock(FileHelper::class)
         );
 
         $this->expectNotToPerformAssertions();
@@ -232,7 +234,8 @@ class ControllerActionArgumentResolverTest extends TestCase
         $argumentResolver = new ControllerActionArgumentResolver(
             $this->createMock(SerializerInterface::class),
             $this->createMock(ScalarValidator::class),
-            $validatorMock
+            $validatorMock,
+            $this->createMock(FileHelper::class)
         );
 
         // BadRequestException имеет массив ошибок (errors) и их нужно проверить, иначе infection не выдает ошибку
@@ -287,6 +290,7 @@ class ControllerActionArgumentResolverTest extends TestCase
                 ]),
                 $this->createMock(ScalarValidator::class),
                 $this->createMock(ValidatorInterface::class),
+                $this->createMock(FileHelper::class),
             ])
             ->setMethodsExcept(['apply'])
             ->getMock();
@@ -308,6 +312,7 @@ class ControllerActionArgumentResolverTest extends TestCase
                 $serializerMock,
                 $this->createMock(ScalarValidator::class),
                 $this->createMock(ValidatorInterface::class),
+                $this->createMock(FileHelper::class),
             ])
             ->setMethodsExcept(['apply'])
             ->getMock();
@@ -339,12 +344,13 @@ class ControllerActionArgumentResolverTest extends TestCase
                 $serializer,
                 $this->createMock(ScalarValidator::class),
                 $this->createMock(ValidatorInterface::class),
+                $this->createMock(FileHelper::class),
             ])
             ->setMethodsExcept(['getObjectOrObjectCollectionFromRequestBody'])
             ->getMock();
 
         $request = $this->createMock(Request::class);
-        // $request->method('getMethod')->willReturn('GET');
+        $request->method('getContentType')->willReturn('');
 
         $actual = $resolver->getObjectOrObjectCollectionFromRequestBody($request, 'AnyClassNameWithNamespace');
         $this->assertSame($expected, $actual);
@@ -519,6 +525,7 @@ class ControllerActionArgumentResolverTest extends TestCase
                 $this->createMock(SerializerInterface::class),
                 $scalarValidatorMock,
                 $this->createMock(ValidatorInterface::class),
+                $this->createMock(FileHelper::class),
             ])
             ->setMethodsExcept(['filterValue'])
             ->getMock();

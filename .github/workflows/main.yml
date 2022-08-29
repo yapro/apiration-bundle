@@ -16,14 +16,19 @@ jobs:
     - name: "Checkout on commit in the repository"
       uses: actions/checkout@v2
     - name: "Build the Docker image"
-      run: docker build -t yapro/apiration-bundle:latest -f ./Dockerfile ./
-    # run command in virtual machine
+      run: docker build -t yapro/apiration-bundle:php7 -f ./Dockerfile ./
+    - run: docker build -t yapro/apiration-bundle:php8 --build-arg "PHP_VERSION=8" -f ./Dockerfile ./
+    # executing commands on a virtual machine:
     - run: id
     - run: pwd
     - run: wget https://github.com/phpmd/phpmd/releases/download/2.12.0/phpmd.phar && chmod +x ./phpmd.phar
     - run: wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.8.0/php-cs-fixer.phar && chmod +x ./php-cs-fixer.phar
-    # run commands in docker:
-    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest ./phpmd.phar . text phpmd.xml --exclude .github/workflows,vendor --strict
-    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest ./php-cs-fixer.phar fix --config=.php-cs-fixer.dist.php -v --dry-run --stop-on-violation --using-cache=no --allow-risky=yes --diff
-    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest composer install --optimize-autoloader --no-scripts --no-interaction
-    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest vendor/bin/simple-phpunit --testsuite=Unit,Functional
+    # run commands on a docker images:
+    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:php7 ./phpmd.phar . text phpmd.xml --exclude .github/workflows,vendor --strict
+    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:php7 ./php-cs-fixer.phar fix --config=.php-cs-fixer.dist.php -v --dry-run --stop-on-violation --using-cache=no --allow-risky=yes --diff
+    - run: cp -f composer.lock.php7 composer.lock
+    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:php7 COMPOSER_MEMORY_LIMIT=-1 composer install --optimize-autoloader --no-scripts --no-interaction
+    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:php7 vendor/bin/simple-phpunit --testsuite=Unit,Functional
+    - run: cp -f composer.lock.php8 composer.lock
+    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:php8 sh -c "COMPOSER_MEMORY_LIMIT=-1 composer install --optimize-autoloader --no-scripts --no-interaction"
+    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:php8 vendor/bin/simple-phpunit --testsuite=Unit,Functional

@@ -1,4 +1,5 @@
-FROM php:7-fpm-buster
+ARG PHP_VERSION=7
+FROM php:$PHP_VERSION-fpm-buster
 
 # используем apt-get вместо apt, чтобы не получать: WARNING: apt does not have a stable CLI interface. Use with caution in scripts.
 RUN apt-get update

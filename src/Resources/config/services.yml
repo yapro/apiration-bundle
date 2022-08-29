@@ -22,6 +22,7 @@ services:
 
     YaPro\Helper\Validation\ScalarValidator: ~
     YaPro\Helper\JsonHelper: ~
+    YaPro\Helper\FileHelper: ~
 
 #    Optionally:
 #    YaPro\ApiRationBundle\Cors\CorsResolver:

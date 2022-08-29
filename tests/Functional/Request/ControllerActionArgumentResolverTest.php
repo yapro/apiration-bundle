@@ -14,6 +14,7 @@ use YaPro\ApiRationBundle\Exception\BadRequestException;
 use YaPro\ApiRationBundle\Request\ControllerActionArgumentResolver;
 use YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel\DollModel;
 use YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel\KenModel;
+use YaPro\Helper\FileHelper;
 use YaPro\Helper\Validation\ScalarValidator;
 
 class ControllerActionArgumentResolverTest extends KernelTestCase
@@ -21,6 +22,7 @@ class ControllerActionArgumentResolverTest extends KernelTestCase
     protected static SerializerInterface $serializer;
     protected static ScalarValidator $scalarValidator;
     protected static ValidatorInterface $validator;
+    protected static FileHelper $fileHelper;
     protected static ControllerActionArgumentResolver $argumentResolver;
 
     public static function setUpBeforeClass()
@@ -30,10 +32,12 @@ class ControllerActionArgumentResolverTest extends KernelTestCase
         self::$serializer = self::$container->get(SerializerInterface::class);
         self::$scalarValidator = self::$container->get(ScalarValidator::class);
         self::$validator = self::$container->get(ValidatorInterface::class);
+        self::$fileHelper = self::$container->get(FileHelper::class);
         self::$argumentResolver = new ControllerActionArgumentResolver(
             self::$serializer,
             self::$scalarValidator,
-            self::$validator
+            self::$validator,
+            self::$fileHelper
         );
     }
 

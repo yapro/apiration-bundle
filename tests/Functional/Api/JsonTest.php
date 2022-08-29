@@ -37,7 +37,7 @@ class JsonTest extends BaseTestCase
                 'varBoolean' => true,
             ],
         ]);
-        $this->assertJsonResponse('[{"varString":"string","varInteger":123,"varBoolean":true,"varFloat":0,"varNull":null}]');
+        $this->assertJsonResponse('[{"varString":"string","varInteger":123,"varBoolean":true,"varFloat":0.0,"varNull":null}]');
     }
 
     public function testFamilyModel(): void

@@ -18,6 +18,7 @@
     "symfony/http-foundation": "*",
     "symfony/http-kernel": "*",
     "symfony/translation": "*",
+    "symfony/polyfill-php80": "*",
     "doctrine/dbal": "2.*",
     "symfony/validator": "*",
     "laminas/laminas-code": "*",
@@ -32,7 +33,7 @@
     "symfony/yaml": "*",
     "symfony/routing": "*",
     "symfony/framework-bundle": "*",
-    "yapro/symfony-http-test-ext": "dev-master"
+    "yapro/symfony-http-test-ext": "*"
   },
   "autoload": {
     "psr-4": {

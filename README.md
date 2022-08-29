@@ -10,6 +10,14 @@ Add as a requirement in your `composer.json` file or run for prod:
 ```sh
 composer require yapro/apiration-bundle laminas/laminas-code:3.4.1
 ```
+
+## Installation on PHP 8
+
+Add as a requirement in your `composer.json` file or run for prod:
+```sh
+composer require yapro/apiration-bundle laminas/laminas-code:4.6.0
+```
+
 As dev:
 ```sh
 composer require yapro/apiration-bundle dev-master
@@ -29,23 +37,15 @@ If the library doesn't work, try to add the following lines to services.yml:
     Symfony\Component\Serializer\Encoder\JsonEncode: ~
 ```
 
-Tests
-------------
-```sh
-docker build -t yapro/apiration-bundle:latest -f ./Dockerfile ./
-docker run --user=1000:1000 --rm -v $(pwd):/app yapro/apiration-bundle:latest bash -c "cd /app \
-  && composer install --optimize-autoloader --no-scripts --no-interaction \
-  && vendor/bin/simple-phpunit --testsuite=Unit,Functional"
-```
-
 Dev
 ------------
 ```sh
-docker build -t yapro/apiration-bundle:latest -f ./Dockerfile ./
-docker run --user=1000:1000 --add-host=host.docker.internal:host-gateway -it --rm -v $(pwd):/app -w /app yapro/apiration-bundle:latest bash
+docker build -t yapro/apiration-bundle:php8 --build-arg "PHP_VERSION=8" -f ./Dockerfile ./
+docker run --rm --user=$(id -u):$(id -g) --add-host=host.docker.internal:host-gateway -it --rm -v $(pwd):/app -w /app yapro/apiration-bundle:php8 bash
+cp -f composer.lock.php8 composer.lock
 composer install -o
 ```
-Debug PHP:
+Debug tests:
 ```sh
 PHP_IDE_CONFIG="serverName=common" \
 XDEBUG_SESSION=common \

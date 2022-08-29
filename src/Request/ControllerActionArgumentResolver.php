@@ -15,8 +15,10 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Polyfill\Php80\PhpToken;
 use YaPro\ApiRationBundle\Exception\BadRequestException;
 use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
+use YaPro\Helper\FileHelper;
 use YaPro\Helper\Validation\ScalarValidator;
 
 /**
@@ -36,15 +38,18 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
     private SerializerInterface $serializer;
     private ScalarValidator $scalarValidator;
     private ValidatorInterface $validator;
+    private FileHelper $fileHelper;
 
     public function __construct(
         SerializerInterface $serializer,
         ScalarValidator $scalarValidator,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        FileHelper $fileHelper
     ) {
         $this->serializer = $serializer;
         $this->scalarValidator = $scalarValidator;
         $this->validator = $validator;
+        $this->fileHelper = $fileHelper;
     }
 
     /**
@@ -77,14 +82,55 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
         if ($className === '') {
             return $className;
         }
-        foreach ($reflector->getDeclaringFile()->getUses() as $classNamespace) {
-            $fullClassNamespace = $this->findFullClassNamespace($className, $classNamespace);
-            if ($fullClassNamespace !== '') {
-                return $fullClassNamespace;
+        // если имя класса записано от корня, например: \App\Model\MyClass
+        if (mb_substr($className, 0, 1)) {
+            return $className;
+        }
+        // вероятно имя класса записано не от корня, например: Model\MyClass или MyClass попробуем найти полный путь:
+        $useList = $this->getUseList($reflector->getName());
+        foreach ($useList as $alias => $classNameNamespace) {
+            if ($alias === $className) {
+                return $classNameNamespace;
             }
         }
 
+        // что смогли, то сделали, на всякий случай возвращаем то, что удалось найти:
         return $className;
+    }
+
+    // https://gist.github.com/Zeronights/7b7d90fcf8d4daf9db0c
+    //
+    public function getUseList(string $classNamespace): array
+    {
+        $result = [];
+        $tokens = PhpToken::tokenize($this->fileHelper->getFileContent($classNamespace));
+        $thisIsUseString = false;
+        $classNamespace = '';
+        $classNamespaceAlias = '';
+        foreach ($tokens as $token) {
+            // $a .= "Line {$token->line}: {$token->getTokenName()} ('{$token->text}')" . PHP_EOL;
+            if ($token->getTokenName() === 'T_CLASS') {
+                break;
+            }
+            if ($token->getTokenName() === 'T_USE') {
+                $thisIsUseString = true;
+                $classNamespace = '';
+                $classNamespaceAlias = '';
+                continue;
+            }
+            if ($thisIsUseString) {
+                if ($token->getTokenName() === ';') {
+                    $thisIsUseString = false;
+                    $result[$classNamespaceAlias] = $classNamespace;
+                } else if ($token->getTokenName() === 'T_NAME_QUALIFIED') {
+                    $classNamespace = $classNamespaceAlias = $token->text;
+                } else if ($token->getTokenName() === 'T_STRING') {
+                    $classNamespaceAlias = $token->text;
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
