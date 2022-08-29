@@ -400,6 +400,7 @@ class ControllerActionArgumentResolverTest extends TestCase
             ->getMock();
         $resolver->method('findShortClassName')->willReturn($findShortClassName);
         $resolver->method('findFullClassNamespace')->willReturn($expected);
+        $resolver->method('getUseList')->willReturn([$findShortClassName => $expected]);
 
         $actual = $resolver->getClassNameWithNamespace($controllerActionFunction, $argumentName);
         $this->assertSame($expected, $actual);

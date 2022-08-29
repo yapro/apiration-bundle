@@ -83,7 +83,7 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
             return $className;
         }
         // если имя класса записано от корня, например: \App\Model\MyClass
-        if (mb_substr($className, 0, 1)) {
+        if (mb_substr($className, 0, 1) === '\\') {
             return $className;
         }
         // вероятно имя класса записано не от корня, например: Model\MyClass или MyClass попробуем найти полный путь:
