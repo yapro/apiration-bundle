@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <phpmd-baseline>
+  <violation rule="PHPMD\Rule\Design\WeightedMethodCount" file="src/Request/ControllerActionArgumentResolver.php"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Functional/Exception/ExceptionResolverTest.php" method="providerOnKernelException"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Unit/Exception/BadRequestExceptionTest.php" method="providerJsonSerialize"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Unit/Exception/ExceptionResolverTest.php" method="providerOnKernelException"/>

@@ -32,6 +32,8 @@ use YaPro\Helper\Validation\ScalarValidator;
  * @see https://qna.habr.com/q/548586#answer_1249224
  *
  * @final final убрал для юнит тестов
+ *
+ * Нельзя заменить ArgumentValueResolverInterface на ValueResolverInterface т.к. последнего нет в symfony < 6
  */
 class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
 {
@@ -122,9 +124,9 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
                 if ($token->getTokenName() === ';') {
                     $thisIsUseString = false;
                     $result[$classNamespaceAlias] = $classNamespace;
-                } else if ($token->getTokenName() === 'T_NAME_QUALIFIED') {
+                } elseif ($token->getTokenName() === 'T_NAME_QUALIFIED') {
                     $classNamespace = $classNamespaceAlias = $token->text;
-                } else if ($token->getTokenName() === 'T_STRING') {
+                } elseif ($token->getTokenName() === 'T_STRING') {
                     $classNamespaceAlias = $token->text;
                 }
             }

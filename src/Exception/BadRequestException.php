@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace YaPro\ApiRationBundle\Exception;
 
-use function is_string;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -36,10 +35,9 @@ class BadRequestException extends \Exception implements \JsonSerializable
     }
 
     /**
-     * @return array
      * @codeCoverageIgnore
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         $errors = [];
         foreach ($this->errors as $fieldName => $error) {
