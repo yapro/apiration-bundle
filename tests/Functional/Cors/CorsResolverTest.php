@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace YaPro\ApiRationBundle\Tests\Functional\Cors;
 
+use Symfony\Component\HttpClient\CurlHttpClient;
 use YaPro\ApiRationBundle\Cors\CorsResolver;
 use YaPro\SymfonyHttpClientExt\HttpClientExtTrait;
 use YaPro\SymfonyHttpTestExt\BaseTestCase;
 
 // Т.к. это доп. функциональность, то:
 // - ниже созданные тесты отключены с помощью phpunit.xml.dist
-// - testLoginWithSecurityCookie не может быть пройден, т.к. требует функционала симфони-авторизации порождающий пхп-сессию
+// - testLoginWithSecurityCookie не может быть пройден, т.к. требует функционала symfony-авторизации порождающий пхп-сессию
 class CorsResolverTest extends BaseTestCase
 {
     use HttpClientExtTrait;
@@ -27,7 +28,7 @@ class CorsResolverTest extends BaseTestCase
         $this->assertHeader('Access-Control-Allow-Headers', CorsResolver::ACCESS_CONTROL_ALLOW_HEADERS);
         $this->assertHeader('Access-Control-Allow-Methods', CorsResolver::ACCESS_CONTROL_ALLOW_METHODS);
         $this->assertHeader('Access-Control-Allow-Origin', $origin);
-        // @todo а какой тут респонс (боди)
+        // @todo а какой тут response (боди)
     }
 
     private function assertHeader(string $headerName, string $headerValue): void
@@ -56,7 +57,7 @@ class CorsResolverTest extends BaseTestCase
 
         // Если self::$client настроен на отправку запросов через реальный веб-сервер (в нашем случае Nginx):
         if (class_exists('Symfony\Component\HttpClient\CurlHttpClient')
-            && $this->getHttpClient() instanceof Symfony\Component\HttpClient\CurlHttpClient) {
+            && $this->getHttpClient() instanceof CurlHttpClient) {
             $this->assertSame('PHPSESSID', $cookieName[0]);
             $this->assertSame($sameAttributes . 'HttpOnly; SameSite=none', trim(implode(';', $cookieParams)));
         } else { // когда self::$client не использует веб-сервер, то мы получаем такой расклад:

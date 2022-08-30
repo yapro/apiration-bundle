@@ -15,26 +15,12 @@ composer require yapro/apiration-bundle laminas/laminas-code:3.4.1
 
 Add as a requirement in your `composer.json` file or run for prod:
 ```sh
-composer require yapro/apiration-bundle laminas/laminas-code:4.6.0
+composer require yapro/apiration-bundle
 ```
 
 As dev:
 ```sh
 composer require yapro/apiration-bundle dev-master
-```
-
-## CORS (Optionally)
-
-```yaml
-    YaPro\ApiRationBundle\Cors\CorsResolver:
-        tags:
-            - { name: kernel.event_subscriber }
-```
-
-If the library doesn't work, try to add the following lines to services.yml:
-```yaml
-    Symfony\Component\Serializer\Encoder\JsonDecode: ~
-    Symfony\Component\Serializer\Encoder\JsonEncode: ~
 ```
 
 Dev
@@ -65,4 +51,18 @@ docker run --user=1000:1000 --rm -v $(pwd):/app -w /app yapro/apiration-bundle:l
 Update phpmd rules:
 ```shell
 docker run --user=1000:1000 --rm -v $(pwd):/app -w /app yapro/apiration-bundle:latest ./phpmd.phar . text phpmd.xml --exclude .github/workflows,vendor --strict --generate-baseline
+```
+
+## CORS (Optional functionality)
+
+```yaml
+    YaPro\ApiRationBundle\Cors\CorsResolver:
+        tags:
+            - { name: kernel.event_subscriber }
+```
+
+If the library doesn't work, try to add the following lines to services.yml:
+```yaml
+    Symfony\Component\Serializer\Encoder\JsonDecode: ~
+    Symfony\Component\Serializer\Encoder\JsonEncode: ~
 ```
