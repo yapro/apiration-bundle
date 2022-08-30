@@ -34,10 +34,11 @@ class BadRequestException extends \Exception implements \JsonSerializable
         $this->errors = $errors;
     }
 
+    #[\ReturnTypeWillChange]
     /**
-     * @codeCoverageIgnore
+     * @return array
      */
-    public function jsonSerialize(): mixed
+    public function jsonSerialize()
     {
         $errors = [];
         foreach ($this->errors as $fieldName => $error) {

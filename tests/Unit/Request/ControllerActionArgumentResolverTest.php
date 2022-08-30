@@ -266,7 +266,12 @@ class ControllerActionArgumentResolverTest extends TestCase
             'getMethod' => 'POST',
         ]);
         // SerializerForMock потому что Serializer::deserialize() помечен как final
-        yield [$requestMock, SerializerForMock::class, 'deserialize'];
+        yield [$requestMock, $this->getSerializerClassName(), 'deserialize'];
+    }
+
+    private function getSerializerClassName(): string
+    {
+        return PHP_MAJOR_VERSION === 7 ? SerializerForMockSymfony5::class : SerializerForMockSymfony6::class;
     }
 
     /**
@@ -336,7 +341,7 @@ class ControllerActionArgumentResolverTest extends TestCase
     public function testGetObjectOrObjectCollectionFromRequestBody()
     {
         $expected = mt_rand();
-        $serializer = $this->createMock(SerializerForMock::class);
+        $serializer = $this->createMock($this->getSerializerClassName());
         $serializer->method('deserialize')->willReturn($expected);
 
         $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
