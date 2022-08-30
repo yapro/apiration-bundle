@@ -28,4 +28,4 @@ jobs:
       run: docker build -t yapro/apiration-bundle:latest --build-arg "PHP_VERSION=8" -f ./Dockerfile ./
     - run: cp -f composer.lock.php8 composer.lock
     - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest sh -c "COMPOSER_MEMORY_LIMIT=-1 composer install --optimize-autoloader --no-scripts --no-interaction"
-    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest sh -c "SYMFONY_DEPRECATIONS_HELPER='max[direct]=9&max[indirect]=77777&verbose=0' vendor/bin/simple-phpunit --testsuite=Unit,Functional'
+    - run: docker run --rm --user=$(id -u):$(id -g) -v $(pwd):/app -w /app yapro/apiration-bundle:latest sh -c "SYMFONY_DEPRECATIONS_HELPER='max[direct]=9&max[indirect]=77777&verbose=0' vendor/bin/simple-phpunit --testsuite=Unit,Functional"
