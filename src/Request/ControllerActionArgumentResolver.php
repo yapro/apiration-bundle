@@ -89,7 +89,7 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
             return $className;
         }
         // вероятно имя класса записано не от корня, например: Model\MyClass или MyClass попробуем найти полный путь:
-        $useList = $this->getUseList($reflector->getName());
+        $useList = $this->addShortNames($this->getUseList($reflector->getFileName()));
         foreach ($useList as $alias => $classNameNamespace) {
             if ($alias === $className) {
                 return $classNameNamespace;
@@ -100,12 +100,29 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
         return $className;
     }
 
+    public function addShortNames(array $useList): array
+    {
+        foreach ($useList as $classNameNamespace) {
+            $parts = explode('\\', $classNameNamespace);
+            if (count($parts) < 2) {
+                continue;
+            }
+            $classNameShort = end($parts);
+            if (isset($useList[$classNameShort])) {
+                continue;
+            }
+            $useList[$classNameShort] = $classNameNamespace;
+        }
+
+        return $useList;
+    }
+
     // https://gist.github.com/Zeronights/7b7d90fcf8d4daf9db0c
     //
-    public function getUseList(string $classNamespace): array
+    public function getUseList(string $filePath): array
     {
         $result = [];
-        $tokens = PhpToken::tokenize($this->fileHelper->getFileContent($classNamespace));
+        $tokens = PhpToken::tokenize($this->fileHelper->getFileContent($filePath));
         $thisIsUseString = false;
         $classNamespace = '';
         $classNamespaceAlias = '';

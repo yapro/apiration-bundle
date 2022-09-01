@@ -28,11 +28,9 @@ Dev
 ```sh
 docker build -t yapro/apiration-bundle:latest -f ./Dockerfile ./
 docker run --rm --user=$(id -u):$(id -g) --add-host=host.docker.internal:host-gateway -it --rm -v $(pwd):/app -w /app yapro/apiration-bundle:latest bash
-cp -f composer.lock.php8 composer.lock
+cp -f composer.lock.php7 composer.lock
 composer install -o
 ```
-if you need php8: docker build -t yapro/apiration-bundle:latest --build-arg "PHP_VERSION=8" -f ./Dockerfile ./
-
 Debug tests:
 ```sh
 PHP_IDE_CONFIG="serverName=common" \
@@ -42,6 +40,11 @@ XDEBUG_CONFIG="max_nesting_level=200 client_port=9003 client_host=host.docker.in
 vendor/bin/simple-phpunit --cache-result-file=/tmp/phpunit.cache -v --stderr --stop-on-incomplete --stop-on-defect \
 --stop-on-failure --stop-on-warning --fail-on-warning --stop-on-risky --fail-on-risky --testsuite=Unit,Functional
 ```
+If you need php8:
+```sh
+docker build -t yapro/apiration-bundle:latest --build-arg "PHP_VERSION=8" -f ./Dockerfile ./
+cp -f composer.lock.php8 composer.lock
+````
 
 Cs-Fixer:
 ```sh
