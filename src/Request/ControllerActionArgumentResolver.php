@@ -95,9 +95,12 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
                 return $classNameNamespace;
             }
         }
+        // что смогли, то сделали, единственное предположим, что класс лежит рядом с текущим файлом:
+        $stack = explode('\\', $controllerClassName);
+        array_pop($stack);
+        $stack[] = $className;
 
-        // что смогли, то сделали, на всякий случай возвращаем то, что удалось найти:
-        return $className;
+        return implode('\\', $stack);
     }
 
     public function addShortNames(array $useList): array
