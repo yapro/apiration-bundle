@@ -79,6 +79,7 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
             $implements = class_implements($argumentFqn, true);
             if (in_array(ApiRationObjectInterface::class, $implements, true)) {
                 $this->currentArgumentFqn = $argumentFqn;
+
                 return true;
             }
         }
@@ -89,10 +90,12 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
         $implements = class_implements($fcn, true);
         if (in_array(ApiRationObjectInterface::class, $implements, true)) {
             $this->currentArgumentFqn = $fcn;
+
             return true;
         }
         if (in_array(ApiRationJsonRequestInterface::class, $implements, true)) {
             $this->currentArgumentFqn = $fcn;
+
             return true;
         }
 

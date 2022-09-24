@@ -48,12 +48,14 @@ cp -f composer.lock.php8 composer.lock
 
 Cs-Fixer:
 ```sh
-docker run --user=1000:1000 --rm -v $(pwd):/app -w /app yapro/apiration-bundle:latest ./php-cs-fixer.phar fix --config=.php-cs-fixer.dist.php -v --using-cache=no --allow-risky=yes
+wget https://github.com/FriendsOfPHP/PHP-CS-Fixer/releases/download/v3.8.0/php-cs-fixer.phar && chmod +x ./php-cs-fixer.phar
+./php-cs-fixer.phar fix --config=.php-cs-fixer.dist.php -v --using-cache=no --allow-risky=yes
 ```
 
 Update phpmd rules:
 ```shell
-docker run --user=1000:1000 --rm -v $(pwd):/app -w /app yapro/apiration-bundle:latest ./phpmd.phar . text phpmd.xml --exclude .github/workflows,vendor --strict --generate-baseline
+wget https://github.com/phpmd/phpmd/releases/download/2.12.0/phpmd.phar && chmod +x ./phpmd.phar
+./phpmd.phar . text phpmd.xml --exclude .github/workflows,vendor --strict --generate-baseline
 ```
 
 ## CORS (Optional functionality)

@@ -63,7 +63,7 @@ class ControllerActionArgumentResolverTest extends TestCase
      * @dataProvider providerSupports
      *
      * @param ?string $argumentType
-     * @param bool   $expected
+     * @param bool    $expected
      */
     public function testSupports(?string $argumentType, bool $expected): void
     {
