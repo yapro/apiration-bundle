@@ -37,11 +37,23 @@ class ControllerActionArgumentResolverTest extends TestCase
     {
         return [
             [
-                'argumentType' => 'any value',
-                'expected' => true,
+                'argumentType' => null,
+                'expected' => false,
+            ],
+            [
+                'argumentType' => 'string',
+                'expected' => false,
             ],
             [
                 'argumentType' => 'array',
+                'expected' => true,
+            ],
+            [
+                'argumentType' => ExampleApiRationObject::class,
+                'expected' => true,
+            ],
+            [
+                'argumentType' => ExampleApiRationJsonRequest::class,
                 'expected' => true,
             ],
         ];
@@ -50,67 +62,27 @@ class ControllerActionArgumentResolverTest extends TestCase
     /**
      * @dataProvider providerSupports
      *
-     * @param string $argumentType
+     * @param ?string $argumentType
      * @param bool   $expected
      */
-    public function testSupports(string $argumentType, bool $expected): void
+    public function testSupports(?string $argumentType, bool $expected): void
     {
         $argumentResolverMock = $this->getMockBuilder(ControllerActionArgumentResolver::class)
             ->disableOriginalConstructor()
             ->setMethodsExcept(['supports'])
             ->getMock();
 
-        $argumentResolverMock->method('isApiRationObjectInterface')->willReturn($expected);
+        $argumentResolverMock->method('getClassNameWithNamespace')->willReturn(ExampleApiRationObject::class);
 
         $requestMock = $this->createMocK(Request::class);
+        $request = Request::createFromGlobals();
+        $request->initialize([], [], ['_controller' => 'any string']);
 
         $argumentMock = $this->createMock(ArgumentMetadata::class);
-        $argumentMock->method('getType')->willReturn('json');
+        $argumentMock->method('getType')->willReturn($argumentType);
+        $argumentMock->method('getName')->willReturn('any string');
 
-        $this->assertSame($expected, $argumentResolverMock->supports($requestMock, $argumentMock));
-    }
-
-    public function providerIsApiRationObjectInterface(): array
-    {
-        return [
-            'Null' => [
-                'classNameWithNamespace' => null,
-                'expected' => false,
-            ],
-            'String' => [
-                'classNameWithNamespace' => 'STRING',
-                'expected' => false,
-            ],
-            'Int' => [
-                'classNameWithNamespace' => 'INT',
-                'expected' => false,
-            ],
-            'SerializerInterface' => [
-                'classNameWithNamespace' => SerializerInterface::class,
-                'expected' => false,
-            ],
-            'ApiRationObjectInterface' => [
-                'classNameWithNamespace' => ExampleApiRationObject::class,
-                'expected' => true,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider providerIsApiRationObjectInterface
-     *
-     * @param $classNameWithNamespace
-     * @param bool $expected
-     */
-    public function testIsApiRationObjectInterface($classNameWithNamespace, bool $expected): void
-    {
-        $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
-            ->disableOriginalConstructor()
-            ->setMethodsExcept(['isApiRationObjectInterface'])
-            ->getMock();
-
-        $actual = $resolver->isApiRationObjectInterface($classNameWithNamespace);
-        $this->assertSame($expected, $actual);
+        $this->assertSame($expected, $argumentResolverMock->supports($request, $argumentMock));
     }
 
     public function providerFixScalarData(): array
@@ -417,28 +389,20 @@ class ControllerActionArgumentResolverTest extends TestCase
         $request->attributes = new ParameterBag(['_controller' => 'string']);
 
         return [
-            'if-1' => [
+            'if' => [
                 'request' => $request,
                 'argument' => $this->createConfiguredMock(ArgumentMetadata::class, [
                     'getType' => 'array',
                     'getName' => 'any string',
                 ]),
-                'isApiRationObjectInterface' => false, // variable not used,
-                'expected' => 'expected value',
-            ],
-            'if-2' => [
-                'request' => $request,
-                'argument' => $this->createConfiguredMock(ArgumentMetadata::class, [
-                    'getType' => 'any value',
-                ]),
-                'isApiRationObjectInterface' => true,
                 'expected' => 'expected value',
             ],
             'else' => [
                 'request' => $request,
-                'argument' => $this->createMock(ArgumentMetadata::class),
-                'isApiRationObjectInterface' => false, // variable not used,
-                'expected' => null,
+                'argument' => $this->createConfiguredMock(ArgumentMetadata::class, [
+                    'getType' => 'any value',
+                ]),
+                'expected' => 'expected value 2',
             ],
         ];
     }
@@ -448,23 +412,20 @@ class ControllerActionArgumentResolverTest extends TestCase
      *
      * @param Request          $request
      * @param ArgumentMetadata $argument
-     * @param bool             $isApiRationObjectInterface
      * @param string|null      $expected
      */
     public function testResolve(
         Request $request,
         ArgumentMetadata $argument,
-        bool $isApiRationObjectInterface,
         ?string $expected
     ): void {
         $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
             ->disableOriginalConstructor()
             ->setMethodsExcept(['resolve'])
             ->getMock();
+        $this->setClassPropertyValue($resolver, 'currentArgumentFqn', 'any string');
 
-        $resolver->method('getClassNameWithNamespace')->willReturn('anyClassNameWithNamespace');
         $resolver->method('getClassNameWithNamespaceForApply')->willReturn('anyClassNameWithNamespaceForApply');
-        $resolver->method('isApiRationObjectInterface')->willReturn($isApiRationObjectInterface);
         $resolver->method('apply')->willReturn($expected);
 
         $this->assertEquals($expected, $resolver->resolve($request, $argument)->current());

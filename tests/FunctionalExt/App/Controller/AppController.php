@@ -6,6 +6,7 @@ namespace YaPro\ApiRationBundle\Tests\FunctionalExt\App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel\KenModel;
@@ -36,7 +37,7 @@ class AppController extends AbstractController
      *
      * @return SimpleModel
      */
-    public function getSimpleModel(SimpleModel $model): SimpleModel
+    public function getSimpleModel(SimpleModel $model, Request $request): SimpleModel
     {
         return $model;
     }

@@ -17,6 +17,7 @@ use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Polyfill\Php80\PhpToken;
 use YaPro\ApiRationBundle\Exception\BadRequestException;
+use YaPro\ApiRationBundle\Marker\ApiRationJsonRequestInterface;
 use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
 use YaPro\Helper\FileHelper;
 use YaPro\Helper\Validation\ScalarValidator;
@@ -41,6 +42,7 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
     private ScalarValidator $scalarValidator;
     private ValidatorInterface $validator;
     private FileHelper $fileHelper;
+    private ?string $currentArgumentFqn = null;
 
     public function __construct(
         SerializerInterface $serializer,
@@ -55,16 +57,46 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
     }
 
     /**
+     * Подсказка: каждый аргумент экшена подвергается проверки этим методом
      * {@inheritdoc}
      */
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
+        $this->currentArgumentFqn = null;
+        $argumentType = $argument->getType();
+        // когда в Controller::action() не передается параметр, то $classNameWithNamespace === null
+        if (!is_string($argumentType)) {
+            return false;
+        }
+        // когда в Controller::action() передается скалярный тип данных:
+        if (in_array(strtolower($argumentType), ['string', 'float', 'int', 'integer', 'bool', 'boolean'], true)) {
+            return false;
+        }
+        // возможно аргумент объявлен как коллекция ApiRationObjectInterface-объектов:
         if ($argument->getType() === 'array') {
-            // если аргумент объявлен как коллекция ApiRationObjectInterface-объектов
+            $controllerActionFunction = $request->attributes->get('_controller');
+            $argumentFqn = $this->getClassNameWithNamespace($controllerActionFunction, $argument->getName());
+            $implements = class_implements($argumentFqn, true);
+            if (in_array(ApiRationObjectInterface::class, $implements, true)) {
+                $this->currentArgumentFqn = $argumentFqn;
+                return true;
+            }
+        }
+        $fcn = $argumentType;
+        if (false === class_exists($fcn)) {
+            return false;
+        }
+        $implements = class_implements($fcn, true);
+        if (in_array(ApiRationObjectInterface::class, $implements, true)) {
+            $this->currentArgumentFqn = $fcn;
+            return true;
+        }
+        if (in_array(ApiRationJsonRequestInterface::class, $implements, true)) {
+            $this->currentArgumentFqn = $fcn;
             return true;
         }
 
-        return $this->isApiRationObjectInterface($argument->getType());
+        return false;
     }
 
     /**
@@ -80,25 +112,25 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
         [$controllerClassName, $methodName] = explode('::', $controllerActionFunction);
         $reflector = new ClassReflection($controllerClassName);
         $docBlock = $reflector->getMethod($methodName)->getDocBlock();
-        $className = $this->findShortClassName($argumentName, $docBlock->getTags());
-        if ($className === '') {
-            return $className;
+        $argumentClassName = $this->findShortClassName($argumentName, $docBlock->getTags());
+        if ($argumentClassName === '') {
+            return $argumentClassName;
         }
         // если имя класса записано от корня, например: \App\Model\MyClass
-        if (mb_substr($className, 0, 1) === '\\') {
-            return $className;
+        if (mb_substr($argumentClassName, 0, 1) === '\\') {
+            return $argumentClassName;
         }
         // вероятно имя класса записано не от корня, например: Model\MyClass или MyClass попробуем найти полный путь:
         $useList = $this->addShortNames($this->getUseList($reflector->getFileName()));
         foreach ($useList as $alias => $classNameNamespace) {
-            if ($alias === $className) {
+            if ($alias === $argumentClassName) {
                 return $classNameNamespace;
             }
         }
         // что смогли, то сделали, единственное предположим, что класс лежит рядом с текущим файлом:
         $stack = explode('\\', $controllerClassName);
         array_pop($stack);
-        $stack[] = $className;
+        $stack[] = $argumentClassName;
 
         return implode('\\', $stack);
     }
@@ -198,23 +230,14 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
         return '';
     }
 
+    // Подсказка: каждый supported-аргумент экшена подвергается обработки этим методом
     public function resolve(Request $request, ArgumentMetadata $argument): \Generator
     {
-        $controllerActionFunction = $request->attributes->get('_controller');
-        if ($argument->getType() === 'array'
-            && is_string($controllerActionFunction)
-            && $classNameWithNamespace = $this->getClassNameWithNamespace($controllerActionFunction, $argument->getName())
-        ) {
-            yield $this->apply($request, $this->getClassNameWithNamespaceForApply($classNameWithNamespace));
-
-            return;
-        }
-        if ($this->isApiRationObjectInterface($argument->getType())) {
+        if ($argument->getType() === 'array') {
+            yield $this->apply($request, $this->getClassNameWithNamespaceForApply($this->currentArgumentFqn));
+        } else {
             yield $this->apply($request, $argument->getType());
-
-            return;
         }
-        yield null;
     }
 
     /**
@@ -300,31 +323,6 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
         } catch (NotNormalizableValueException $e) {
             throw new BadRequestException('Deserialization problem', ['check the API contract' => $e->getMessage()], $e);
         }
-    }
-
-    /**
-     * @internal private
-     *
-     * @param $classNameWithNamespace
-     *
-     * @return bool
-     */
-    public function isApiRationObjectInterface($classNameWithNamespace): bool
-    {
-        if (
-            // когда в Controller::action() не передается параметр, то $classNameWithNamespace === null
-            !is_string($classNameWithNamespace)
-            // когда в Controller::action() передается скалярный тип данных:
-            || in_array(strtolower($classNameWithNamespace), ['string', 'float', 'int', 'integer', 'bool', 'boolean'], true)
-        ) {
-            return false;
-        }
-        if (false === class_exists($classNameWithNamespace)) {
-            return false;
-        }
-        $implements = class_implements($classNameWithNamespace, true);
-
-        return in_array(ApiRationObjectInterface::class, $implements, true);
     }
 
     /**
