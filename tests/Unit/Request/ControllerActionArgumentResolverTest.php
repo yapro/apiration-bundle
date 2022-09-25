@@ -8,6 +8,11 @@ use Laminas\Code\Reflection\DocBlock\Tag\ParamTag;
 use Laminas\Code\Reflection\DocBlock\Tag\ReturnTag;
 use Laminas\Code\Reflection\DocBlock\Tag\TagInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\RequestStack;
+use YaPro\ApiRationBundle\Marker\ApiRationJsonRequestInterface;
+use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
+use YaPro\ApiRationBundle\Request\JsonRequest;
+use YaPro\Helper\JsonHelper;
 use function rand;
 use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;
@@ -53,7 +58,7 @@ class ControllerActionArgumentResolverTest extends TestCase
                 'expected' => true,
             ],
             [
-                'argumentType' => ExampleApiRationJsonRequest::class,
+                'argumentType' => JsonRequest::class,
                 'expected' => true,
             ],
         ];
@@ -74,7 +79,6 @@ class ControllerActionArgumentResolverTest extends TestCase
 
         $argumentResolverMock->method('getClassNameWithNamespace')->willReturn(ExampleApiRationObject::class);
 
-        $requestMock = $this->createMocK(Request::class);
         $request = Request::createFromGlobals();
         $request->initialize([], [], ['_controller' => 'any string']);
 
@@ -152,11 +156,16 @@ class ControllerActionArgumentResolverTest extends TestCase
         $validatorMock = $this->createMock(ValidatorInterface::class);
         $validatorMock->method('validate')->willReturn($constraintViolationList);
 
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->method('getMasterRequest')->willReturn(new Request());
+
         $argumentResolver = new ControllerActionArgumentResolver(
             $this->createMock(SerializerInterface::class),
             $this->createMock(ScalarValidator::class),
             $validatorMock,
-            $this->createMock(FileHelper::class)
+            $this->createMock(FileHelper::class),
+            $this->createMock(JsonHelper::class),
+            $requestStack
         );
 
         $this->expectNotToPerformAssertions();
@@ -203,11 +212,16 @@ class ControllerActionArgumentResolverTest extends TestCase
         $validatorMock = $this->createMock(ValidatorInterface::class);
         $validatorMock->method('validate')->willReturn($constraintViolationList);
 
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->method('getMasterRequest')->willReturn(new Request());
+
         $argumentResolver = new ControllerActionArgumentResolver(
             $this->createMock(SerializerInterface::class),
             $this->createMock(ScalarValidator::class),
             $validatorMock,
-            $this->createMock(FileHelper::class)
+            $this->createMock(FileHelper::class),
+            $this->createMock(JsonHelper::class),
+            $requestStack
         );
 
         // BadRequestException имеет массив ошибок (errors) и их нужно проверить, иначе infection не выдает ошибку
@@ -260,6 +274,9 @@ class ControllerActionArgumentResolverTest extends TestCase
         $expected = new stdClass();
         $expected->property = 'value';
 
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->method('getMasterRequest')->willReturn(new Request());
+
         $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
             ->setConstructorArgs([
                 $this->createConfiguredMock($serializerClassName, [
@@ -268,6 +285,8 @@ class ControllerActionArgumentResolverTest extends TestCase
                 $this->createMock(ScalarValidator::class),
                 $this->createMock(ValidatorInterface::class),
                 $this->createMock(FileHelper::class),
+                $this->createMock(JsonHelper::class),
+                $requestStack,
             ])
             ->setMethodsExcept(['apply'])
             ->getMock();
@@ -284,12 +303,17 @@ class ControllerActionArgumentResolverTest extends TestCase
         $serializerMock = $this->createMock(Serializer::class);
         $serializerMock->method('denormalize')->willThrowException($this->createMock(ExceptionInterface::class));
 
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->method('getMasterRequest')->willReturn(new Request());
+
         $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
             ->setConstructorArgs([
                 $serializerMock,
                 $this->createMock(ScalarValidator::class),
                 $this->createMock(ValidatorInterface::class),
                 $this->createMock(FileHelper::class),
+                $this->createMock(JsonHelper::class),
+                $requestStack,
             ])
             ->setMethodsExcept(['apply'])
             ->getMock();
@@ -316,12 +340,17 @@ class ControllerActionArgumentResolverTest extends TestCase
         $serializer = $this->createMock($this->getSerializerClassName());
         $serializer->method('deserialize')->willReturn($expected);
 
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->method('getMasterRequest')->willReturn(new Request());
+
         $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
             ->setConstructorArgs([
                 $serializer,
                 $this->createMock(ScalarValidator::class),
                 $this->createMock(ValidatorInterface::class),
                 $this->createMock(FileHelper::class),
+                $this->createMock(JsonHelper::class),
+                $requestStack,
             ])
             ->setMethodsExcept(['getObjectOrObjectCollectionFromRequestBody'])
             ->getMock();
@@ -393,16 +422,25 @@ class ControllerActionArgumentResolverTest extends TestCase
                 'request' => $request,
                 'argument' => $this->createConfiguredMock(ArgumentMetadata::class, [
                     'getType' => 'array',
-                    'getName' => 'any string',
                 ]),
-                'expected' => 'expected value',
+                'currentArgumentFqn' => 'any string',
+                'expected' => 'expected value 1',
+            ],
+            'elseif' => [
+                'request' => $request,
+                'argument' => $this->createConfiguredMock(ArgumentMetadata::class, [
+                    'getType' => 'not array',
+                ]),
+                'currentArgumentFqn' => ApiRationObjectInterface::class,
+                'expected' => 'expected value 2',
             ],
             'else' => [
                 'request' => $request,
                 'argument' => $this->createConfiguredMock(ArgumentMetadata::class, [
-                    'getType' => 'any value',
+                    'getType' => 'not array',
                 ]),
-                'expected' => 'expected value 2',
+                'currentArgumentFqn' => ApiRationJsonRequestInterface::class,
+                'expected' => new JsonRequest($request, $this->createMock(JsonHelper::class)),
             ],
         ];
     }
@@ -410,20 +448,23 @@ class ControllerActionArgumentResolverTest extends TestCase
     /**
      * @dataProvider providerResolve
      *
-     * @param Request          $request
+     * @param Request $request
      * @param ArgumentMetadata $argument
-     * @param string|null      $expected
+     * @param string $currentArgumentFqn
+     * @param string|JsonRequest $expected
      */
     public function testResolve(
         Request $request,
         ArgumentMetadata $argument,
-        ?string $expected
+        string $currentArgumentFqn,
+        $expected
     ): void {
         $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
             ->disableOriginalConstructor()
             ->setMethodsExcept(['resolve'])
             ->getMock();
-        $this->setClassPropertyValue($resolver, 'currentArgumentFqn', 'any string');
+        $this->setClassPropertyValue($resolver, 'currentArgumentFqn', $currentArgumentFqn);
+        $this->setClassPropertyValue($resolver, 'jsonHelper', $this->createMock(JsonHelper::class));
 
         $resolver->method('getClassNameWithNamespaceForApply')->willReturn('anyClassNameWithNamespaceForApply');
         $resolver->method('apply')->willReturn($expected);
@@ -487,12 +528,17 @@ class ControllerActionArgumentResolverTest extends TestCase
             'filterBoolean' => $filterBoolean,
         ]);
 
+        $requestStack = $this->createMock(RequestStack::class);
+        $requestStack->method('getMasterRequest')->willReturn(new Request());
+
         $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
             ->setConstructorArgs([
                 $this->createMock(SerializerInterface::class),
                 $scalarValidatorMock,
                 $this->createMock(ValidatorInterface::class),
                 $this->createMock(FileHelper::class),
+                $this->createMock(JsonHelper::class),
+                $requestStack,
             ])
             ->setMethodsExcept(['filterValue'])
             ->getMock();

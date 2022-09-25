@@ -7,6 +7,7 @@ namespace YaPro\ApiRationBundle\Tests\Functional\Request;
 use Generator;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -15,6 +16,7 @@ use YaPro\ApiRationBundle\Request\ControllerActionArgumentResolver;
 use YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel\DollModel;
 use YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel\KenModel;
 use YaPro\Helper\FileHelper;
+use YaPro\Helper\JsonHelper;
 use YaPro\Helper\Validation\ScalarValidator;
 
 class ControllerActionArgumentResolverTest extends KernelTestCase
@@ -33,11 +35,16 @@ class ControllerActionArgumentResolverTest extends KernelTestCase
         self::$scalarValidator = self::$container->get(ScalarValidator::class);
         self::$validator = self::$container->get(ValidatorInterface::class);
         self::$fileHelper = self::$container->get(FileHelper::class);
+        $jsonHelper = self::$container->get(JsonHelper::class);
+        $requestStack = new RequestStack();
+        $requestStack->push(new Request());
         self::$argumentResolver = new ControllerActionArgumentResolver(
             self::$serializer,
             self::$scalarValidator,
             self::$validator,
-            self::$fileHelper
+            self::$fileHelper,
+            $jsonHelper,
+            $requestStack
         );
     }
 

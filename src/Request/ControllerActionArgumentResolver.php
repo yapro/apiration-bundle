@@ -8,6 +8,7 @@ use Laminas\Code\Reflection\ClassReflection;
 use Laminas\Code\Reflection\DocBlock\Tag\ParamTag;
 use Laminas\Code\Reflection\DocBlock\Tag\TagInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Controller\ArgumentValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
@@ -20,6 +21,7 @@ use YaPro\ApiRationBundle\Exception\BadRequestException;
 use YaPro\ApiRationBundle\Marker\ApiRationJsonRequestInterface;
 use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
 use YaPro\Helper\FileHelper;
+use YaPro\Helper\JsonHelper;
 use YaPro\Helper\Validation\ScalarValidator;
 
 /**
@@ -42,18 +44,24 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
     private ScalarValidator $scalarValidator;
     private ValidatorInterface $validator;
     private FileHelper $fileHelper;
+    private JsonHelper $jsonHelper;
+    private Request $request;
     private ?string $currentArgumentFqn = null;
 
     public function __construct(
         SerializerInterface $serializer,
         ScalarValidator $scalarValidator,
         ValidatorInterface $validator,
-        FileHelper $fileHelper
+        FileHelper $fileHelper,
+        JsonHelper $jsonHelper,
+        RequestStack $requestStack
     ) {
         $this->serializer = $serializer;
         $this->scalarValidator = $scalarValidator;
         $this->validator = $validator;
         $this->fileHelper = $fileHelper;
+        $this->jsonHelper = $jsonHelper;
+        $this->request = $requestStack->getMasterRequest();
     }
 
     /**
@@ -89,17 +97,31 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
         }
         $implements = class_implements($fcn, true);
         if (in_array(ApiRationObjectInterface::class, $implements, true)) {
-            $this->currentArgumentFqn = $fcn;
+            $this->currentArgumentFqn = ApiRationObjectInterface::class;
 
             return true;
         }
         if (in_array(ApiRationJsonRequestInterface::class, $implements, true)) {
-            $this->currentArgumentFqn = $fcn;
+            $this->currentArgumentFqn = ApiRationJsonRequestInterface::class;
 
             return true;
         }
 
         return false;
+    }
+
+    // Подсказка: каждый supported-аргумент экшена подвергается обработки этим методом
+    public function resolve(Request $request, ArgumentMetadata $argument): \Generator
+    {
+        if ($argument->getType() === 'array') {
+            yield $this->apply($request, $this->getClassNameWithNamespaceForApply($this->currentArgumentFqn));
+        } else {
+            if ($this->currentArgumentFqn === ApiRationObjectInterface::class) {
+                yield $this->apply($request, $argument->getType());
+            } else {
+                yield new JsonRequest($request, $this->jsonHelper);
+            }
+        }
     }
 
     /**
@@ -233,16 +255,6 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
         return '';
     }
 
-    // Подсказка: каждый supported-аргумент экшена подвергается обработки этим методом
-    public function resolve(Request $request, ArgumentMetadata $argument): \Generator
-    {
-        if ($argument->getType() === 'array') {
-            yield $this->apply($request, $this->getClassNameWithNamespaceForApply($this->currentArgumentFqn));
-        } else {
-            yield $this->apply($request, $argument->getType());
-        }
-    }
-
     /**
      * Метод используется только для вызова внутри resolve, чтобы избежать ошибок от infection
      *
@@ -292,7 +304,7 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
                 $array = $this->fixScalarData($request->query->all());
                 $objectOrObjectCollection = $this->serializer->denormalize($array, $classNameWithNamespace);
             } catch (ExceptionInterface $e) {
-                throw new BadRequestException('', [], $e);
+                throw new BadRequestException('Unable to denormalize data', [], $e);
             }
         } else {
             $objectOrObjectCollection = $this->getObjectOrObjectCollectionFromRequestBody(
