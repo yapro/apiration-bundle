@@ -8,16 +8,12 @@ use Laminas\Code\Reflection\DocBlock\Tag\ParamTag;
 use Laminas\Code\Reflection\DocBlock\Tag\ReturnTag;
 use Laminas\Code\Reflection\DocBlock\Tag\TagInterface;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\RequestStack;
-use YaPro\ApiRationBundle\Marker\ApiRationJsonRequestInterface;
-use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
-use YaPro\ApiRationBundle\Request\JsonRequest;
-use YaPro\Helper\JsonHelper;
 use function rand;
 use stdClass;
 use Symfony\Component\HttpFoundation\InputBag;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Serializer;
@@ -27,8 +23,12 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use YaPro\ApiRationBundle\Exception\BadRequestException;
+use YaPro\ApiRationBundle\Marker\ApiRationJsonRequestInterface;
+use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
 use YaPro\ApiRationBundle\Request\ControllerActionArgumentResolver;
+use YaPro\ApiRationBundle\Request\JsonRequest;
 use YaPro\Helper\FileHelper;
+use YaPro\Helper\JsonHelper;
 use YaPro\Helper\LiberatorTrait;
 use YaPro\Helper\Validation\ScalarValidator;
 
@@ -448,9 +448,9 @@ class ControllerActionArgumentResolverTest extends TestCase
     /**
      * @dataProvider providerResolve
      *
-     * @param Request $request
-     * @param ArgumentMetadata $argument
-     * @param string $currentArgumentFqn
+     * @param Request            $request
+     * @param ArgumentMetadata   $argument
+     * @param string             $currentArgumentFqn
      * @param string|JsonRequest $expected
      */
     public function testResolve(
