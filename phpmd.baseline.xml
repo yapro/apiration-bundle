@@ -5,5 +5,6 @@
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Unit/Exception/BadRequestExceptionTest.php" method="providerJsonSerialize"/>
   <violation rule="PHPMD\Rule\Design\LongMethod" file="tests/Unit/Exception/ExceptionResolverTest.php" method="providerOnKernelException"/>
   <violation rule="PHPMD\Rule\Design\TooManyPublicMethods" file="tests/Unit/Request/ControllerActionArgumentResolverTest.php"/>
+  <violation rule="PHPMD\Rule\Design\CouplingBetweenObjects" file="tests/Unit/Request/ControllerActionArgumentResolverTest.php"/>
   <violation rule="PHPMD\Rule\Naming\ShortVariable" file="tests/Unit/Request/ExampleController.php"/>
 </phpmd-baseline>
