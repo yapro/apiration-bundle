@@ -158,7 +158,6 @@ class ControllerActionArgumentResolverTest extends TestCase
 
         $requestStack = $this->createMock(RequestStack::class);
         $requestStack->method('getMainRequest')->willReturn(new Request());
-        $requestStack->method('getMasterRequest')->willReturn(new Request());
 
         $argumentResolver = new ControllerActionArgumentResolver(
             $this->createMock(SerializerInterface::class),
@@ -215,7 +214,6 @@ class ControllerActionArgumentResolverTest extends TestCase
 
         $requestStack = $this->createMock(RequestStack::class);
         $requestStack->method('getMainRequest')->willReturn(new Request());
-        $requestStack->method('getMasterRequest')->willReturn(new Request());
 
         $argumentResolver = new ControllerActionArgumentResolver(
             $this->createMock(SerializerInterface::class),
@@ -278,7 +276,6 @@ class ControllerActionArgumentResolverTest extends TestCase
 
         $requestStack = $this->createMock(RequestStack::class);
         $requestStack->method('getMainRequest')->willReturn(new Request());
-        $requestStack->method('getMasterRequest')->willReturn(new Request());
 
         $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
             ->setConstructorArgs([
@@ -308,7 +305,6 @@ class ControllerActionArgumentResolverTest extends TestCase
 
         $requestStack = $this->createMock(RequestStack::class);
         $requestStack->method('getMainRequest')->willReturn(new Request());
-        $requestStack->method('getMasterRequest')->willReturn(new Request());
 
         $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
             ->setConstructorArgs([
@@ -346,7 +342,6 @@ class ControllerActionArgumentResolverTest extends TestCase
 
         $requestStack = $this->createMock(RequestStack::class);
         $requestStack->method('getMainRequest')->willReturn(new Request());
-        $requestStack->method('getMasterRequest')->willReturn(new Request());
 
         $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
             ->setConstructorArgs([
@@ -535,7 +530,6 @@ class ControllerActionArgumentResolverTest extends TestCase
 
         $requestStack = $this->createMock(RequestStack::class);
         $requestStack->method('getMainRequest')->willReturn(new Request());
-        $requestStack->method('getMasterRequest')->willReturn(new Request());
 
         $resolver = $this->getMockBuilder(ControllerActionArgumentResolver::class)
             ->setConstructorArgs([
