@@ -61,7 +61,7 @@ class ControllerActionArgumentResolver implements ArgumentValueResolverInterface
         $this->validator = $validator;
         $this->fileHelper = $fileHelper;
         $this->jsonHelper = $jsonHelper;
-        $this->request = $requestStack->getMasterRequest();
+        $this->request = method_exists($requestStack, 'getMainRequest') ? $requestStack->getMainRequest() : $requestStack->getMasterRequest();
     }
 
     /**
