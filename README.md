@@ -4,6 +4,81 @@ The lib to cast a request to a Model object and cast a Model object to a respons
 
 ![lib tests](https://github.com/yapro/apiration-bundle/actions/workflows/main.yml/badge.svg)
 
+## How to use
+
+1. Make a SimpleModel class
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel;
+
+use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
+
+class SimpleModel implements ApiRationObjectInterface
+{
+    private string $varString;
+    private bool $varBoolean;
+
+    public function __construct(string $varString, bool $varBoolean) {
+        $this->varString = $varString;
+        $this->varBoolean = $varBoolean;
+    }
+
+    public function getVarString(): string
+    {
+        return $this->varString;
+    }
+
+    public function isVarBoolean(): bool
+    {
+        return $this->varBoolean;
+    }
+}
+```
+2. Use SimpleModel in controller action (specify the namespace completely)
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+
+class AppController extends AbstractController
+{
+    /**
+     * @Route("/api-json-test/simple-model")
+     *
+     * @param \App\SimpleModel $model
+     *
+     * @return SimpleModel
+     */
+    public function getSimpleModel(SimpleModel $model, Request $request): SimpleModel
+    {
+        return $model;
+    }
+}
+```
+3. Make curl request
+```shell
+curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' -d'
+{
+  "varString": "string",
+  "varBoolean": "true"
+}
+'
+```
+4. Get an answer
+```shell
+{"varString":"string","varBoolean":true}
+```
+
 ## Installation on PHP 7
 
 Add as a requirement in your `composer.json` file or run for prod:
