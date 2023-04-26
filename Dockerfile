@@ -21,7 +21,8 @@ RUN curl https://getcomposer.org/download/2.0.12/composer.phar --output /usr/bin
     chmod +x /usr/bin/composer
 
 # Install xdebug extension
-RUN install-php-extensions xdebug-3.1.3
+
+RUN case "$PHP_VERSION" in ( "8"* ) install-php-extensions xdebug;; ( * ) install-php-extensions xdebug-3.1.5;; esac
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
