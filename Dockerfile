@@ -11,15 +11,17 @@ RUN apt install -y apt-utils
 RUN apt-get install -y \
     zip \
     libzip-dev
-RUN docker-php-ext-configure zip \
-    && docker-php-ext-install zip
+
+COPY --from=mlocati/php-extension-installer:1.4.14 /usr/bin/install-php-extensions /usr/local/bin/
+
+RUN install-php-extensions zip
 
 # Install composer
 RUN curl https://getcomposer.org/download/2.0.12/composer.phar --output /usr/bin/composer && \
     chmod +x /usr/bin/composer
 
 # Install xdebug extension
-RUN pecl install xdebug && docker-php-ext-enable xdebug
+RUN install-php-extensions xdebug-3.1.3
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
