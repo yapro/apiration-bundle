@@ -118,8 +118,7 @@ class ControllerActionArgumentResolverTest extends KernelTestCase
             self::$serializer->serialize($content, 'json')
         );
 
-        // we have to invoke support before resolve. The method resolve depend on support through its state.
-        $argumentMetadata = new ArgumentMetadata('testVar', KenModel::class, false, false, null);
+        // we have to invoke method "supports" before method "resolve". The method "resolve" depends on support through its state.
         self::$argumentResolver->supports($request, $argumentMetadata);
 
         $resolveArguments = iterator_to_array(
