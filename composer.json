@@ -19,7 +19,6 @@
     "symfony/http-kernel": "*",
     "symfony/translation": "*",
     "symfony/polyfill-php80": "^v1.25.0",
-    "doctrine/dbal": "2.*",
     "symfony/validator": "*",
     "laminas/laminas-code": "*",
     "yapro/helpers": "*",
@@ -27,6 +26,7 @@
   },
   "require-dev": {
     "doctrine/orm": "*",
+    "doctrine/dbal": "2.*",
     "symfony/phpunit-bridge": "*",
     "symfony/browser-kit": "*",
     "doctrine/annotations": "*",
