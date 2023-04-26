@@ -64,10 +64,7 @@ class ExceptionResolver
         } elseif ($this->isORMInvalidArgumentException($exception)) {
             $httpStatusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
             $message = self::MSG_ON_ORM_INVALID_ARGUMENT;
-        } elseif (
-            class_exists('\Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException') &&
-            $exception instanceof \Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException
-        ) {
+        } elseif ($this->isForeignKeyConstraintViolation($exception)) {
             $httpStatusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
             $tableName = explode(self::SEPARATOR_IN_MSG_ON_FOREIGN_CONSTRAINT_VIOLATION, $exception->getMessage());
             $message = sprintf(
@@ -159,5 +156,11 @@ class ExceptionResolver
         return class_exists('Doctrine\ORM\ORMInvalidArgumentException')
             && $exception instanceof \Doctrine\ORM\ORMInvalidArgumentException
             && mb_strpos($exception->getMessage(), self::ORM_INVALID_ARGUMENT_EXCEPTION_MESSAGE) === 0;
+    }
+
+    private function isForeignKeyConstraintViolation(\Throwable $exception): bool
+    {
+        return class_exists('\Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException') &&
+            $exception instanceof \Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
     }
 }
