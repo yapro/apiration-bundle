@@ -27,15 +27,15 @@ class ControllerActionArgumentResolverTest extends KernelTestCase
     protected static FileHelper $fileHelper;
     protected static ControllerActionArgumentResolver $argumentResolver;
 
-    public static function setUpBeforeClass()
+    public function setUp()
     {
-        parent::setUpBeforeClass();
+        parent::setUp();
         self::bootKernel();
-        self::$serializer = self::$container->get(SerializerInterface::class);
-        self::$scalarValidator = self::$container->get(ScalarValidator::class);
-        self::$validator = self::$container->get(ValidatorInterface::class);
-        self::$fileHelper = self::$container->get(FileHelper::class);
-        $jsonHelper = self::$container->get(JsonHelper::class);
+        self::$serializer = self::getContainer()->get(SerializerInterface::class);
+        self::$scalarValidator = self::getContainer()->get(ScalarValidator::class);
+        self::$validator = self::getContainer()->get(ValidatorInterface::class);
+        self::$fileHelper = self::getContainer()->get(FileHelper::class);
+        $jsonHelper = self::getContainer()->get(JsonHelper::class);
         $requestStack = new RequestStack();
         $requestStack->push(new Request());
         self::$argumentResolver = new ControllerActionArgumentResolver(
@@ -117,6 +117,10 @@ class ControllerActionArgumentResolverTest extends KernelTestCase
             ],
             self::$serializer->serialize($content, 'json')
         );
+
+        // we have to invoke method "supports" before method "resolve". The method "resolve" depends on support through its state.
+        self::$argumentResolver->supports($request, $argumentMetadata);
+
         $resolveArguments = iterator_to_array(
             self::$argumentResolver->resolve($request, $argumentMetadata)
         );

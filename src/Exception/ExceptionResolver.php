@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace YaPro\ApiRationBundle\Exception;
 
 use function class_exists;
-use Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -66,7 +64,7 @@ class ExceptionResolver
         } elseif ($this->isORMInvalidArgumentException($exception)) {
             $httpStatusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
             $message = self::MSG_ON_ORM_INVALID_ARGUMENT;
-        } elseif ($exception instanceof ForeignKeyConstraintViolationException) {
+        } elseif ($this->isForeignKeyConstraintViolation($exception)) {
             $httpStatusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
             $tableName = explode(self::SEPARATOR_IN_MSG_ON_FOREIGN_CONSTRAINT_VIOLATION, $exception->getMessage());
             $message = sprintf(
@@ -111,7 +109,8 @@ class ExceptionResolver
      */
     private function isDuplicateRowInDatabase($exception): bool
     {
-        return $exception instanceof UniqueConstraintViolationException &&
+        return class_exists('\Doctrine\DBAL\Exception\UniqueConstraintViolationException') &&
+            $exception instanceof \Doctrine\DBAL\Exception\UniqueConstraintViolationException &&
             $exception->getPrevious() &&
             // в третьей версии Doctrine\DBAL уже нет PDOException
             class_exists('Doctrine\DBAL\Driver\PDOException') &&
@@ -157,5 +156,11 @@ class ExceptionResolver
         return class_exists('Doctrine\ORM\ORMInvalidArgumentException')
             && $exception instanceof \Doctrine\ORM\ORMInvalidArgumentException
             && mb_strpos($exception->getMessage(), self::ORM_INVALID_ARGUMENT_EXCEPTION_MESSAGE) === 0;
+    }
+
+    private function isForeignKeyConstraintViolation(\Throwable $exception): bool
+    {
+        return class_exists('\Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException') &&
+            $exception instanceof \Doctrine\DBAL\Exception\ForeignKeyConstraintViolationException;
     }
 }
