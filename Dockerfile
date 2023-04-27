@@ -12,9 +12,8 @@ RUN apt-get install -y \
     zip \
     libzip-dev
 
-COPY --from=mlocati/php-extension-installer:1.4.14 /usr/bin/install-php-extensions /usr/local/bin/
-
-RUN install-php-extensions zip
+RUN docker-php-ext-configure zip \
+    && docker-php-ext-install zip
 
 # Install composer
 RUN curl https://getcomposer.org/download/2.0.12/composer.phar --output /usr/bin/composer && \
@@ -22,7 +21,8 @@ RUN curl https://getcomposer.org/download/2.0.12/composer.phar --output /usr/bin
 
 # Install xdebug extension
 
-RUN case "$PHP_VERSION" in ( "8"* ) install-php-extensions xdebug;; ( * ) install-php-extensions xdebug-3.1.5;; esac
+RUN case "$PHP_VERSION" in ( "8"* ) pecl install xdebug;; ( * ) pecl install  xdebug-3.1.5;; esac && \
+    docker-php-ext-enable xdebug
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
