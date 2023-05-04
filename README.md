@@ -1,12 +1,12 @@
 # Api Ration Bundle
 
-The lib to cast a request to a Model object and cast a Model object to a response.
+The lib to casts a request to a Model object and casts a Model object to a response.
 
 ![lib tests](https://github.com/yapro/apiration-bundle/actions/workflows/main.yml/badge.svg)
 
 ## How to use
 
-1. Make a SimpleModel class
+1. Make an ApiRationObject, example SimpleModel
 ```php
 <?php
 
@@ -37,7 +37,7 @@ class SimpleModel implements ApiRationObjectInterface
     }
 }
 ```
-2. Use SimpleModel in controller action (specify the namespace completely)
+2. Use the SimpleModel in controller action (specify the namespace completely)
 ```php
 <?php
 
@@ -65,19 +65,20 @@ class AppController extends AbstractController
     }
 }
 ```
-3. Make curl request
+3. Make the curl request
 ```shell
-curl -X GET "localhost:9200/_search?pretty" -H 'Content-Type: application/json' -d'
+curl -X GET "localhost/api-json-test/simple-model" -H 'Content-Type: application/json' -d'
 {
   "varString": "string",
   "varBoolean": "true"
 }
 '
 ```
-4. Get an answer
+4. Get the answer
 ```shell
 {"varString":"string","varBoolean":true}
 ```
+More examples: [see tests](tests/Functional/Api/JsonTest.php)
 
 ## Installation on PHP 7
 

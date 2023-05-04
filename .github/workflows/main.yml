@@ -1,4 +1,4 @@
-name: phpmd + php-cs-fixer + phpunit tests ON php 7/8
+name: phpmd + php-cs + phpunit tests ON php 7,8
 
 on:
   push:
