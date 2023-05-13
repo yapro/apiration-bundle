@@ -12,7 +12,7 @@ The lib to casts a request to a Model object and casts a Model object to a respo
 
 declare(strict_types=1);
 
-namespace YaPro\ApiRationBundle\Tests\FunctionalExt\App\JsonConvertModel;
+namespace App;
 
 use YaPro\ApiRationBundle\Marker\ApiRationObjectInterface;
 
@@ -46,7 +46,6 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -78,7 +77,7 @@ curl -X GET "localhost/api-json-test/simple-model" -H 'Content-Type: application
 ```shell
 {"varString":"string","varBoolean":true}
 ```
-More examples: [see tests](tests/Functional/Api/JsonTest.php)
+More [examples](tests/FunctionalExt/App/Controller/AppController.php) and [tests](tests/Functional/Api/JsonTest.php)
 
 ## Installation on PHP 7
 
