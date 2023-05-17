@@ -79,6 +79,62 @@ curl -X GET "localhost/api-json-test/simple-model" -H 'Content-Type: application
 ```
 More [examples](tests/FunctionalExt/App/Controller/AppController.php) and [tests](tests/Functional/Api/JsonTest.php)
 
+### How to make JsonLd Response (hydra:Collection)
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use YaPro\ApiRationBundle\Response\JsonLd\CollectionJsonLdResponse;
+
+class AppController extends AbstractController
+{
+    /**
+     * @Route("/search", methods={"GET"})
+     *
+     * @param Request           $request
+     * @param ArticleRepository $articleRepository
+     *
+     * @return CollectionJsonLdResponse
+     */
+    public function search(Request $request, ArticleRepository $articleRepository): CollectionJsonLdResponse
+    {
+        $text = $request->query->get('text', '');
+        $response = new CollectionJsonLdResponse($request);
+        if (empty($text)) {
+            return $response;
+        }
+        
+        $response = new CollectionJsonLdResponse($request);
+        $offset = $response->getOffset();
+        $limit = $response->getLimit();
+
+        $items = $this->getEntityManager()->getConnection()->fetchAll("
+            SELECT 
+            	id,
+            	title
+			FROM Article
+			WHERE title LIKE :searchValue
+			ORDER BY createdAt DESC
+			LIMIT $offset, $limit
+        ", [
+             'searchValue' => $text,
+         ]);
+
+        return $response->initData(
+            $items,
+            $this->getTotalItems()
+        );
+    }
+}
+```
+
 ## Installation on PHP 7
 
 Add as a requirement in your `composer.json` file or run for prod:
