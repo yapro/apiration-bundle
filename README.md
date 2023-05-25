@@ -77,6 +77,8 @@ curl -X GET "localhost/api-json-test/simple-model" -H 'Content-Type: application
 ```shell
 {"varString":"string","varBoolean":true}
 ```
+As you can see, any object which implements the ApiRationObjectInterface is automatically converted to json.
+
 More [examples](tests/FunctionalExt/App/Controller/AppController.php) and [tests](tests/Functional/Api/JsonTest.php)
 
 ### How to make JsonLd Response (hydra:Collection)
@@ -133,6 +135,54 @@ class AppController extends AbstractController
         );
     }
 }
+```
+
+If you need to create a JsonLd response for the creation operation, try:
+
+```php
+        return new ResourceCreatedJsonLdResponse(
+            $article->getId(),
+            [
+                'title' => $article->getTitle(),
+                'text' => $article->getText(),
+            ]
+        );
+```
+
+If you need to create a JsonLd response for an update operation, try ResourceUpdatedJsonLdResponse.
+
+### JsonRequest - the simple way to work with Request
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use YaPro\ApiRationBundle\Request\JsonRequest;
+
+class AppController extends AbstractController
+{
+    /**
+     * @Route("/search", methods={"POST"})
+     *
+     * @param JsonRequest           $request
+     * @param ArticleRepository $articleRepository
+     *
+     * @return CollectionJsonLdResponse
+     */
+    public function search(JsonRequest $request): JsonResponse
+    {
+        $userAddresses = $request->getArray();
+        // OR:
+        $myFieldValue = $request->getObject()->myField;
+
+        return $this->json([]);
+    }
 ```
 
 ## Installation on PHP 7
