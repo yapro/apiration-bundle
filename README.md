@@ -81,76 +81,6 @@ As you can see, any object which implements the ApiRationObjectInterface is auto
 
 More [examples](tests/FunctionalExt/App/Controller/AppController.php) and [tests](tests/Functional/Api/JsonTest.php)
 
-### How to make JsonLd Response (hydra:Collection)
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace App\Controller;
-
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
-use YaPro\ApiRationBundle\Response\JsonLd\CollectionJsonLdResponse;
-
-class AppController extends AbstractController
-{
-    /**
-     * @Route("/search", methods={"GET"})
-     *
-     * @param Request           $request
-     * @param ArticleRepository $articleRepository
-     *
-     * @return CollectionJsonLdResponse
-     */
-    public function search(Request $request, ArticleRepository $articleRepository): CollectionJsonLdResponse
-    {
-        $text = $request->query->get('text', '');
-        $response = new CollectionJsonLdResponse($request);
-        if (empty($text)) {
-            return $response;
-        }
-        
-        $response = new CollectionJsonLdResponse($request);
-        $offset = $response->getOffset();
-        $limit = $response->getLimit();
-
-        $items = $this->getEntityManager()->getConnection()->fetchAll("
-            SELECT 
-            	id,
-            	title
-			FROM Article
-			WHERE title LIKE :searchValue
-			ORDER BY createdAt DESC
-			LIMIT $offset, $limit
-        ", [
-             'searchValue' => $text,
-         ]);
-
-        return $response->initData(
-            $items,
-            $this->getTotalItems()
-        );
-    }
-}
-```
-
-If you need to create a JsonLd response for the creation operation, try:
-
-```php
-        return new ResourceCreatedJsonLdResponse(
-            $article->getId(),
-            [
-                'title' => $article->getTitle(),
-                'text' => $article->getText(),
-            ]
-        );
-```
-
-If you need to create a JsonLd response for an update operation, try ResourceUpdatedJsonLdResponse.
-
 ### JsonRequest - the simple way to work with Request
 
 ```php
@@ -183,6 +113,72 @@ class AppController extends AbstractController
 
         return $this->json([]);
     }
+```
+
+If you need to create a JsonLd response for the creation operation, try:
+
+```php
+        return new ResourceCreatedJsonLdResponse(
+            $article->getId(),
+            [
+                'title' => $article->getTitle(),
+                'text' => $article->getText(),
+            ]
+        );
+```
+
+If you need to create a JsonLd response for an update operation, try [ResourceUpdatedJsonLdResponse](src/Response/JsonLd/ResourceUpdatedJsonLdResponse.php). 
+
+### How to make JsonLd Response (hydra:Collection)
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controller;
+
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use YaPro\ApiRationBundle\Response\JsonLd\CollectionJsonLdResponse;
+
+class AppController extends AbstractController
+{
+    /**
+     * @Route("/search", methods={"GET"})
+     *
+     * @param Request           $request
+     * @param ArticleRepository $articleRepository
+     *
+     * @return CollectionJsonLdResponse
+     */
+    public function search(Request $request, ArticleRepository $articleRepository): CollectionJsonLdResponse
+    {
+        $response = new CollectionJsonLdResponse($request);
+        $searchValue = $request->query->get('searchValue', '');
+        if (empty($searchValue)) {
+            return $response;
+        }
+
+        $items = $this->getEntityManager()->getConnection()->fetchAll("
+            SELECT 
+            	id,
+            	title
+			FROM Article
+			WHERE title LIKE :searchValue
+			ORDER BY createdAt DESC
+			LIMIT " . $response->getOffset() . ", " . $response->getLimit() . "
+        ", [
+             'searchValue' => $searchValue,
+         ]);
+
+        return $response->initData(
+            $items,
+            $this->getTotalItems()
+        );
+    }
+}
 ```
 
 ## Installation on PHP 7
