@@ -107,9 +107,9 @@ class AppController extends AbstractController
      */
     public function search(JsonRequest $request): JsonResponse
     {
-        $userAddresses = $request->getArray();
+        $userAddresses = $request->getArray(); // request: ["foo@go.com", "bar@go.com"]
         // OR:
-        $myFieldValue = $request->getObject()->myField;
+        $myFieldValue = $request->getObject()->myField; // request: {"myField": "my value"}
 
         return $this->json([]);
     }
@@ -163,12 +163,12 @@ class AppController extends AbstractController
 
         $items = $this->getEntityManager()->getConnection()->fetchAll("
             SELECT 
-            	id,
-            	title
-			FROM Article
-			WHERE title LIKE :searchValue
-			ORDER BY createdAt DESC
-			LIMIT " . $response->getOffset() . ", " . $response->getLimit() . "
+                id,
+                title
+            FROM Article
+            WHERE title LIKE :searchValue
+            ORDER BY createdAt DESC
+            LIMIT " . $response->getOffset() . ", " . $response->getLimit() . "
         ", [
              'searchValue' => $searchValue,
          ]);
@@ -180,6 +180,43 @@ class AppController extends AbstractController
     }
 }
 ```
+
+Notice: symfony 6.3 is supports 
+[similar features](https://symfony.com/blog/new-in-symfony-6-3-mapping-request-data-to-typed-objects), the bundle 
+supports more functionality, for example, responding to an invalid request by throwing a BadRequestException:
+```php
+$message = 'Validation errors';
+$errors = [
+    'field_name' => 'The name cannot contain a number',
+    'field_lastname' => [
+        'The name cannot contain a number',
+        'Name must be at least 2 characters long',
+    ],
+];
+throw new BadRequestException($message, $errors);
+```
+and the client will receive the response with the status 400:
+```shell
+{
+    "message": "Validation errors",
+    "errors": [
+        {
+            "fieldName": "field_name",
+            "messages": [
+                "The name cannot contain a number"
+            ]
+        },
+        {
+            "fieldName": "field_lastname",
+            "messages": [
+                "The name cannot contain a number",
+                "Name must be at least 2 characters long"
+            ]
+        }
+    ]
+}
+```
+More [examples](tests/Unit/Exception/BadRequestExceptionTest.php).
 
 ## Installation on PHP 7
 
