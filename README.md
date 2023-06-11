@@ -1,6 +1,6 @@
 # Api Ration Bundle
 
-The lib to casts a request to a Model object and casts a Model object to a response.
+The library casts a json-request to your object and casts your object to a json-response.
 
 ![lib tests](https://github.com/yapro/apiration-bundle/actions/workflows/main.yml/badge.svg)
 
@@ -103,7 +103,7 @@ class AppController extends AbstractController
      * @param JsonRequest           $request
      * @param ArticleRepository $articleRepository
      *
-     * @return CollectionJsonLdResponse
+     * @return JsonResponse
      */
     public function search(JsonRequest $request): JsonResponse
     {
@@ -130,6 +130,8 @@ If you need to create a JsonLd response for the creation operation, try:
 If you need to create a JsonLd response for an update operation, try [ResourceUpdatedJsonLdResponse](src/Response/JsonLd/ResourceUpdatedJsonLdResponse.php). 
 
 ### How to make JsonLd Response (hydra:Collection)
+
+[CollectionJsonLdResponse](src/Response/JsonLd/CollectionJsonLdResponse.php) is automatically support pagination:
 
 ```php
 <?php
@@ -182,7 +184,7 @@ class AppController extends AbstractController
 ```
 
 Notice: symfony 6.3 is supports 
-[similar features](https://symfony.com/blog/new-in-symfony-6-3-mapping-request-data-to-typed-objects), the bundle 
+[similar features](https://symfony.com/blog/new-in-symfony-6-3-mapping-request-data-to-typed-objects), but the bundle 
 supports more functionality, for example, responding to an invalid request by throwing a BadRequestException:
 ```php
 $message = 'Validation errors';
