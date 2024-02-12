@@ -148,6 +148,25 @@ use YaPro\ApiRationBundle\Response\JsonLd\CollectionJsonLdResponse;
 class AppController extends AbstractController
 {
     /**
+     * @Route("/list", methods={"GET"})
+     */
+    public function list(Request $request, ArticleRepository $articleRepository, SerializerInterface $serializer)
+    {
+        $collection = $articleRepository->getList();
+        /*
+            function getList(): array {
+                return $this->createQueryBuilder('t')
+                    ->select('t')
+                    ->where('t.difficulty > 0')
+                    ->getQuery()
+                    ->getResult();
+            }
+        */
+        $items = $serializer->normalize($collection, null, ['groups' => 'apiRead']);
+        return (new CollectionJsonLdResponse($request))->initData($items);
+    }
+    
+    /**
      * @Route("/search", methods={"GET"})
      *
      * @param Request           $request
